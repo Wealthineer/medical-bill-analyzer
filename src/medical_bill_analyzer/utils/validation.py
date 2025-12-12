@@ -70,7 +70,7 @@ def validate_date(
     if d is None:
         return False
 
-    if require_past and d > date.today():
+    if require_past and d >= date.today():
         raise ValidationError(f"Date must be in the past, got {d}")
 
     if not allow_future and d > date.today():

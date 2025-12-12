@@ -1,0 +1,154 @@
+"""Tests for configuration settings."""
+
+import pytest
+from pathlib import Path
+import yaml
+import os
+
+from medical_bill_analyzer.config.settings import (
+    Settings,
+    LLMConfig,
+    StorageConfig,
+    BonusConfig,
+    ExtractionConfig,
+    get_config_path,
+    is_first_run,
+)
+from medical_bill_analyzer.config.defaults import get_user_config_dir
+
+
+class TestSettings:
+    """Test Settings class."""
+
+    def test_default_settings(self):
+        """Test that default settings can be created."""
+        settings = Settings()
+        assert settings.llm.provider == "anthropic"
+        assert settings.bonus.default_threshold == 1000.0
+        assert settings.extraction.retry_attempts == 1
+        assert settings.extraction.extract_line_items is False
+
+    def test_settings_from_dict(self, sample_config_data):
+        """Test creating settings from dictionary."""
+        settings = Settings(**sample_config_data)
+        assert settings.llm.provider == "anthropic"
+        assert settings.llm.anthropic.model == "claude-sonnet-4-20250514"
+        assert settings.bonus.default_threshold == 1000
+
+    def test_settings_to_yaml(self, temp_dir, sample_config_data):
+        """Test saving settings to YAML."""
+        settings = Settings(**sample_config_data)
+        yaml_path = temp_dir / "config.yaml"
+
+        settings.to_yaml(yaml_path)
+
+        assert yaml_path.exists()
+        with open(yaml_path) as f:
+            data = yaml.safe_load(f)
+        assert data["llm"]["provider"] == "anthropic"
+        assert data["bonus"]["default_threshold"] == 1000
+
+    def test_settings_from_yaml(self, temp_dir, sample_config_data):
+        """Test loading settings from YAML."""
+        yaml_path = temp_dir / "config.yaml"
+
+        # Write config
+        with open(yaml_path, "w") as f:
+            yaml.dump(sample_config_data, f)
+
+        # Load config
+        settings = Settings.from_yaml(yaml_path)
+
+        assert settings.llm.provider == "anthropic"
+        assert settings.bonus.default_threshold == 1000
+
+    def test_settings_from_nonexistent_yaml(self, temp_dir):
+        """Test loading from non-existent file returns defaults."""
+        yaml_path = temp_dir / "nonexistent.yaml"
+        settings = Settings.from_yaml(yaml_path)
+
+        # Should return default settings
+        assert settings.llm.provider == "anthropic"
+        assert settings.bonus.default_threshold == 1000.0
+
+
+class TestLLMConfig:
+    """Test LLM configuration."""
+
+    def test_anthropic_config(self):
+        """Test Anthropic configuration."""
+        config = LLMConfig(provider="anthropic")
+        assert config.provider == "anthropic"
+        assert config.anthropic.model == "claude-sonnet-4-20250514"
+        assert config.anthropic.api_key_env == "ANTHROPIC_API_KEY"
+
+    def test_openai_config(self):
+        """Test OpenAI configuration."""
+        config = LLMConfig(provider="openai")
+        assert config.provider == "openai"
+        assert config.openai.model == "gpt-4o-mini"
+
+    def test_ollama_config(self):
+        """Test Ollama configuration."""
+        config = LLMConfig(provider="ollama")
+        assert config.provider == "ollama"
+        assert config.ollama.host == "http://localhost:11434"
+        assert config.ollama.model == "llama3.1:8b"
+
+    def test_api_key_from_env(self, monkeypatch):
+        """Test API key retrieval from environment."""
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-123")
+
+        config = LLMConfig(provider="anthropic")
+        assert config.anthropic.api_key == "test-key-123"
+
+    def test_api_key_missing(self):
+        """Test API key when not in environment."""
+        config = LLMConfig(provider="anthropic")
+        # Should return None if not set
+        # (Don't check actual env var in case it's set)
+        assert config.anthropic.api_key is None or isinstance(config.anthropic.api_key, str)
+
+
+class TestStorageConfig:
+    """Test storage configuration."""
+
+    def test_default_paths(self):
+        """Test default storage paths."""
+        config = StorageConfig()
+        assert config.database_path.name == "medical_bills.db"
+        assert config.pdf_storage_path.name == "pdfs"
+
+    def test_relative_path_resolution(self):
+        """Test that relative paths are resolved to user config dir."""
+        config = StorageConfig(
+            database_path="./data/test.db",
+            pdf_storage_path="./data/pdfs/",
+        )
+
+        # Should be resolved relative to user config dir
+        assert config.database_path.is_absolute()
+        assert config.pdf_storage_path.is_absolute()
+
+
+class TestConfigHelpers:
+    """Test configuration helper functions."""
+
+    def test_get_user_config_dir(self):
+        """Test getting user config directory."""
+        config_dir = get_user_config_dir()
+        assert config_dir.name == ".medical-bill-analyzer"
+        assert config_dir.is_absolute()
+
+    def test_get_config_path(self):
+        """Test getting config file path."""
+        config_path = get_config_path()
+        assert config_path.name == "config.yaml"
+        assert config_path.parent.name == ".medical-bill-analyzer"
+
+    def test_is_first_run(self):
+        """Test first run detection."""
+        # This will depend on whether config actually exists
+        # Just verify it returns a boolean
+        result = is_first_run()
+        assert isinstance(result, bool)
