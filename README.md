@@ -130,9 +130,68 @@ bonus:
 
 ## Development
 
+### Project Status
+
+**Current Implementation**: Phase 1.1-1.3 Complete (30%)
+- ✅ Project infrastructure setup
+- ✅ Configuration management
+- ✅ Utilities and logging
+- ✅ Comprehensive automated tests (99 tests, 88% coverage)
+
+See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed progress tracking.
+
 ### Running Tests
+
+The project includes a comprehensive automated test suite covering all implemented modules.
+
+**Run all tests:**
 ```bash
-poetry run pytest
+pytest
+```
+
+**Run with coverage report:**
+```bash
+pytest --cov=medical_bill_analyzer --cov-report=html --cov-report=term
+```
+
+**Run specific test module:**
+```bash
+pytest tests/unit/test_config/
+pytest tests/unit/test_utils/test_date_utils.py
+```
+
+### Test Coverage
+
+**Current Status**: 99 tests, 88% overall coverage
+
+| Module | Tests | Coverage |
+|--------|-------|----------|
+| Configuration | 15 | 91-100% |
+| File utilities | 17 | 96% |
+| Date utilities | 18 | 100% |
+| Currency utilities | 21 | 95% |
+| Validation | 18 | 93% |
+| Exceptions | 10 | 100% |
+
+**View detailed coverage report:**
+After running tests with coverage, open `htmlcov/index.html` in your browser:
+```bash
+pytest --cov=medical_bill_analyzer --cov-report=html
+open htmlcov/index.html  # macOS
+xdg-open htmlcov/index.html  # Linux
+start htmlcov/index.html  # Windows
+```
+
+### Test Structure
+
+```
+tests/
+├── conftest.py              # Shared pytest fixtures
+├── unit/                    # Unit tests
+│   ├── test_config/         # Configuration module tests
+│   ├── test_utils/          # Utility function tests
+│   └── test_core/           # Core module tests
+└── integration/             # Integration tests (future)
 ```
 
 ### Code Formatting
@@ -145,6 +204,16 @@ poetry run ruff check src tests
 ```bash
 poetry run mypy src
 ```
+
+### Development Workflow
+
+1. **Create a new feature branch**
+2. **Implement the feature** (refer to task files in `docs/tasks/`)
+3. **Write tests** for the new functionality
+4. **Run tests** and ensure all pass with good coverage
+5. **Format code** with black and ruff
+6. **Update documentation** (IMPLEMENTATION.md, phase task files)
+7. **Commit changes** with descriptive messages
 
 ## License
 
