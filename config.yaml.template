@@ -1,0 +1,45 @@
+# Medical Bill Analyzer Configuration Template
+# Copy this file to ~/.medical-bill-analyzer/config.yaml and customize
+
+llm:
+  # LLM provider: anthropic, openai, or ollama
+  provider: anthropic
+
+  # Anthropic Claude settings
+  anthropic:
+    model: claude-sonnet-4-20250514
+    api_key_env: ANTHROPIC_API_KEY  # Environment variable name
+    max_tokens: 1000
+    temperature: 0
+
+  # OpenAI GPT settings
+  openai:
+    model: gpt-4o-mini
+    api_key_env: OPENAI_API_KEY  # Environment variable name
+    max_tokens: 1000
+    temperature: 0
+
+  # Ollama local LLM settings
+  ollama:
+    host: http://localhost:11434
+    model: llama3.1:8b  # Or: mistral, phi3, etc.
+    timeout: 60
+
+storage:
+  # Database path (absolute or relative to config directory)
+  database_path: ./data/medical_bills.db
+
+  # PDF storage path (absolute or relative to config directory)
+  pdf_storage_path: ./data/pdfs/
+
+bonus:
+  # Default bonus threshold in EUR
+  default_threshold: 1000
+
+extraction:
+  # Number of retry attempts on LLM API failure
+  retry_attempts: 1
+
+  # Extract line items from bills (Phase 3 feature)
+  # Set to true to enable detailed line item extraction
+  extract_line_items: false

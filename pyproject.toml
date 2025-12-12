@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "medical-bill-analyzer"
+version = "0.1.0"
+description = "A desktop application for German private health insurance customers to analyze medical bills"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "medical_bill_analyzer", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+typer = "^0.12.0"
+rich = "^13.7.0"
+pydantic = "^2.5.0"
+pydantic-settings = "^2.1.0"
+pyyaml = "^6.0.1"
+python-dotenv = "^1.0.0"
+pdfplumber = "^0.11.0"
+anthropic = "^0.39.0"
+openai = "^1.52.0"
+ollama = "^0.4.0"
+tabulate = "^0.9.0"
+python-dateutil = "^2.8.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-cov = "^4.1.0"
+black = "^24.0.0"
+ruff = "^0.1.0"
+mypy = "^1.8.0"
+
+[tool.poetry.scripts]
+medical-bill-analyzer = "medical_bill_analyzer.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=medical_bill_analyzer --cov-report=html --cov-report=term"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
