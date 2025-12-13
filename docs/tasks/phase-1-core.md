@@ -104,30 +104,31 @@
 
 ---
 
-## 1.4 Database Layer
+## 1.4 Database Layer ✅ COMPLETED
 
-**Status**: 🔄 Pending
+**Status**: ✅ Done
 
-### Files to Create:
-- [ ] `src/medical_bill_analyzer/database/__init__.py`
-- [ ] `src/medical_bill_analyzer/database/connection.py`
-- [ ] `src/medical_bill_analyzer/database/schema.py`
-- [ ] `src/medical_bill_analyzer/database/models.py`
-- [ ] `src/medical_bill_analyzer/database/repositories/__init__.py`
-- [ ] `src/medical_bill_analyzer/database/repositories/base.py`
-- [ ] `src/medical_bill_analyzer/database/repositories/bill_repository.py`
-- [ ] `src/medical_bill_analyzer/database/migrations/__init__.py`
-- [ ] `src/medical_bill_analyzer/database/migrations/v1_initial.sql`
-- [ ] `src/medical_bill_analyzer/database/migrations/migration_manager.py`
+### Files Created:
+- [x] `src/medical_bill_analyzer/database/__init__.py`
+- [x] `src/medical_bill_analyzer/database/connection.py`
+- [x] `src/medical_bill_analyzer/database/schema.py`
+- [x] `src/medical_bill_analyzer/database/models.py`
+- [x] `src/medical_bill_analyzer/database/repositories/__init__.py`
+- [x] `src/medical_bill_analyzer/database/repositories/base.py`
+- [x] `src/medical_bill_analyzer/database/repositories/bill_repository.py`
+- [x] `src/medical_bill_analyzer/database/migrations/__init__.py`
+- [x] `src/medical_bill_analyzer/database/migrations/v1_initial.sql`
+- [x] `src/medical_bill_analyzer/database/migrations/migration_manager.py`
 
 ### Tasks:
-- [ ] Create SQLite connection manager with context managers
-- [ ] Define bills table schema (see SQL below)
-- [ ] Create Pydantic models (Bill, BillCreate, BillUpdate)
-- [ ] Implement base repository class with CRUD operations
-- [ ] Implement BillRepository with specialized queries
-- [ ] Create migration manager for schema versioning
-- [ ] Write v1_initial.sql migration
+- [x] Create SQLite connection manager with context managers
+- [x] Define bills table schema (see SQL below)
+- [x] Create Pydantic models (Bill, BillCreate, BillUpdate, BillFilter)
+- [x] Implement base repository class with CRUD operations
+- [x] Implement BillRepository with specialized queries
+- [x] Create migration manager for schema versioning
+- [x] Write v1_initial.sql migration
+- [x] Add Decimal type adapter/converter for currency handling
 
 ### Database Schema (v1_initial.sql):
 ```sql
@@ -160,19 +161,34 @@ CREATE INDEX idx_file_hash ON bills(file_hash);
 ```
 
 ### Key Repository Methods:
-- [ ] `create(bill: BillCreate) -> Bill`
-- [ ] `get_by_id(id: int) -> Bill | None`
-- [ ] `get_by_date_range(start: date, end: date) -> List[Bill]`
-- [ ] `get_by_year(year: int) -> List[Bill]`
-- [ ] `check_duplicate_hash(file_hash: str) -> bool`
-- [ ] `get_by_status(status: str) -> List[Bill]`
+- [x] `create(bill: BillCreate) -> Bill`
+- [x] `get_by_id(id: int) -> Bill | None`
+- [x] `get_by_filename(filename: str) -> Bill | None`
+- [x] `get_by_date_range(start: date, end: date) -> List[Bill]`
+- [x] `get_by_year(year: int) -> List[Bill]`
+- [x] `check_duplicate_hash(file_hash: str) -> bool`
+- [x] `get_by_status(status: str) -> List[Bill]`
+- [x] `filter(criteria: BillFilter) -> List[Bill]`
+- [x] `update(id: int, updates: BillUpdate) -> Bill`
+- [x] `delete(id: int) -> bool`
+- [x] `get_total_amount(...) -> Decimal`
+- [x] `count(filter: BillFilter) -> int`
+
+### Key Features:
+- ✅ SQLite connection management with context managers
+- ✅ Decimal type support for accurate currency handling
+- ✅ Migration system for schema versioning
+- ✅ Repository pattern for clean data access
+- ✅ Type-safe Pydantic models
+- ✅ Duplicate detection by file hash and filename
+- ✅ Flexible filtering by date, practitioner, status, amount
+- ✅ Foreign key support and indexed queries
 
 ### Testing:
-- [ ] Test database initialization
-- [ ] Test CRUD operations
-- [ ] Test duplicate detection
-- [ ] Test date range queries
-- [ ] Test migration application
+- [x] Manual integration test (verified all operations work)
+- [ ] Automated unit tests (Phase 1.10)
+
+**Commit**: `0c0f897` - "Add Phase 1.4: Database layer with SQLite and repository pattern"
 
 ---
 
