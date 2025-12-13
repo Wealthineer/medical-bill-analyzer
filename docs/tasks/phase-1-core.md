@@ -184,11 +184,17 @@ CREATE INDEX idx_file_hash ON bills(file_hash);
 - ✅ Flexible filtering by date, practitioner, status, amount
 - ✅ Foreign key support and indexed queries
 
-### Testing:
+### Testing Status ✅:
 - [x] Manual integration test (verified all operations work)
-- [ ] Automated unit tests (Phase 1.10)
+- [x] Automated unit tests: 93 tests, 87-99% coverage
+  - test_models.py: 19 tests (Pydantic validation)
+  - test_connection.py: 16 tests (connection management, Decimal support)
+  - test_migrations.py: 20 tests (migration system, schema verification)
+  - test_bill_repository.py: 41 tests (CRUD, filtering, aggregates)
 
-**Commit**: `0c0f897` - "Add Phase 1.4: Database layer with SQLite and repository pattern"
+**Commits**:
+- `0c0f897` - "Add Phase 1.4: Database layer with SQLite and repository pattern"
+- `1c041cb` - "Add comprehensive automated tests for Phase 1.4 Database layer"
 
 ---
 
