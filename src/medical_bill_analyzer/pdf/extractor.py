@@ -3,6 +3,8 @@
 from pathlib import Path
 
 import pdfplumber
+from pdfminer.pdfdocument import PDFPasswordIncorrect
+from pdfminer.pdfparser import PDFSyntaxError
 
 from ..core.exceptions import PDFProcessingError
 from ..utils.logger import get_logger
@@ -68,12 +70,12 @@ def extract_text_from_pdf(pdf_path: Path) -> str:
 
             return full_text
 
-    except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as e:
+    except PDFSyntaxError as e:
         raise PDFProcessingError(
             f"PDF appears to be corrupted or malformed: {e}"
         ) from e
 
-    except pdfplumber.pdfminer.pdfdocument.PDFPasswordIncorrect as e:
+    except PDFPasswordIncorrect as e:
         raise PDFProcessingError(
             f"PDF is password-protected and cannot be read: {pdf_path}"
         ) from e

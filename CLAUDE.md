@@ -1,1 +1,3 @@
 - Make sure to always keep the @IMPLEMENTATION.md up to date - including the sub files
+- Keep @README.md up to date
+- make sure to create automated tests for every feature we build

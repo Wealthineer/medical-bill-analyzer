@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import List
 
 import pdfplumber
+from pdfminer.pdfdocument import PDFPasswordIncorrect
+from pdfminer.pdfparser import PDFSyntaxError
 
 from ..core.exceptions import PDFProcessingError
 from ..utils.logger import get_logger
@@ -140,10 +142,10 @@ def validate_pdf(pdf_path: Path) -> ValidationResult:
                 f"scanned={is_scanned}"
             )
 
-    except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as e:
+    except PDFSyntaxError as e:
         errors.append(f"PDF is corrupted or malformed: {e}")
 
-    except pdfplumber.pdfminer.pdfdocument.PDFPasswordIncorrect:
+    except PDFPasswordIncorrect:
         errors.append("PDF is password-protected")
 
     except Exception as e:
