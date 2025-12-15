@@ -33,6 +33,7 @@ def main():
     # Configuration
     provider_name = "anthropic"  # Change to "openai" or "ollama" to test others
     pdf_path = Path("tests/test_data/sample_bills/valid_bill.pdf")
+    #pdf_path = Path("tests/test_data/sample_bills/ZE-Anteilsrechnung_Plan_11736,11735,11734_ReNr_1_25_68725_3.pdf")
 
     # Check PDF exists
     if not pdf_path.exists():
