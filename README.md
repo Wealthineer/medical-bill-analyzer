@@ -41,6 +41,11 @@ Or using pip:
 pip install -e .
 ```
 
+> **⚠️ Note**: The CLI commands shown below are planned for Phase 1.9 and not yet implemented.
+>
+> **Current Status (Phase 1.6)**: The core modules (PDF processing, LLM providers, database) are complete.
+> For manual testing of current functionality, see [MANUAL_TESTING.md](MANUAL_TESTING.md).
+
 3. Run the setup wizard:
 ```bash
 medical-bill-analyzer setup
