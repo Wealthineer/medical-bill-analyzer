@@ -54,7 +54,7 @@ class OpenAIConfig(BaseModel):
 class OllamaConfig(BaseModel):
     """Ollama local LLM configuration."""
 
-    host: str = DEFAULT_OLLAMA_HOST
+    base_url: str = DEFAULT_OLLAMA_HOST
     model: str = DEFAULT_OLLAMA_MODEL
     timeout: int = 60
 
@@ -66,6 +66,23 @@ class LLMConfig(BaseModel):
     anthropic: AnthropicConfig = Field(default_factory=AnthropicConfig)
     openai: OpenAIConfig = Field(default_factory=OpenAIConfig)
     ollama: OllamaConfig = Field(default_factory=OllamaConfig)
+
+    def get_provider_config(self) -> dict:
+        """Get the active provider's configuration with API key resolved.
+
+        Returns:
+            Dict with provider-specific config including resolved API key
+        """
+        if self.provider == "anthropic":
+            config = self.anthropic.model_dump()
+            config["api_key"] = self.anthropic.api_key
+            return config
+        elif self.provider == "openai":
+            config = self.openai.model_dump()
+            config["api_key"] = self.openai.api_key
+            return config
+        else:  # ollama
+            return self.ollama.model_dump()
 
 
 class StorageConfig(BaseModel):
@@ -113,6 +130,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
         case_sensitive=False,
+        extra="ignore",  # Ignore extra environment variables
     )
 
     @classmethod

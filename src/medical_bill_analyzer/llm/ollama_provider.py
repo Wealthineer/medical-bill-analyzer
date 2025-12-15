@@ -22,7 +22,7 @@ class OllamaProvider(LLMProvider):
     Example:
         >>> config = {
         ...     "model": "llama3.1:8b",
-        ...     "host": "http://localhost:11434",
+        ...     "base_url": "http://localhost:11434",
         ...     "options": {"temperature": 0}
         ... }
         >>> provider = OllamaProvider(config)
@@ -35,13 +35,13 @@ class OllamaProvider(LLMProvider):
         Args:
             config: Configuration dict with keys:
                 - model: Ollama model name (e.g., "llama3.1:8b")
-                - host: Ollama server URL (default: "http://localhost:11434")
+                - base_url: Ollama server URL (default: "http://localhost:11434")
                 - options: Dict of Ollama options (temperature, etc.)
         """
         super().__init__(config)
 
-        host = config.get("host", "http://localhost:11434")
-        self.client = Client(host=host)
+        base_url = config.get("base_url", "http://localhost:11434")
+        self.client = Client(host=base_url)
         self.options = config.get("options", {})
 
         # Set default temperature to 0 for deterministic extraction
@@ -50,7 +50,7 @@ class OllamaProvider(LLMProvider):
 
         logger.info(
             f"Ollama provider initialized with model={self.model}, "
-            f"host={host}, options={self.options}"
+            f"base_url={base_url}, options={self.options}"
         )
 
     def extract(self, bill_text: str, extraction_type: str = "basic") -> Dict[str, Any]:

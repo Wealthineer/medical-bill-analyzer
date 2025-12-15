@@ -125,6 +125,27 @@ class BillRepository(BaseRepository[Bill]):
 
         return Bill(**self._row_to_dict(row))
 
+    def get_by_file_hash(self, file_hash: str) -> Optional[Bill]:
+        """
+        Get bill by file hash.
+
+        Args:
+            file_hash: SHA256 file hash
+
+        Returns:
+            Bill if found, None otherwise
+        """
+        sql = "SELECT * FROM bills WHERE file_hash = ?"
+
+        with self.db.get_connection() as conn:
+            cursor = conn.execute(sql, (file_hash,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Bill(**self._row_to_dict(row))
+
     def check_duplicate_hash(self, file_hash: str) -> bool:
         """
         Check if a bill with the given file hash already exists.

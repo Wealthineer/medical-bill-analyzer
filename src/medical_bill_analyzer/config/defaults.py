@@ -42,3 +42,34 @@ DEFAULT_TEMPERATURE = 0.0
 DEFAULT_BONUS_THRESHOLD = 1000.0  # EUR
 DEFAULT_RETRY_ATTEMPTS = 1
 DEFAULT_EXTRACT_LINE_ITEMS = False
+
+# Default configuration dictionary
+DEFAULT_CONFIG = {
+    "llm": {
+        "provider": DEFAULT_LLM_PROVIDER,
+        "anthropic": {
+            "model": DEFAULT_ANTHROPIC_MODEL,
+            "api_key_env": "ANTHROPIC_API_KEY",
+            "max_tokens": DEFAULT_MAX_TOKENS,
+            "temperature": DEFAULT_TEMPERATURE,
+        },
+        "openai": {
+            "model": DEFAULT_OPENAI_MODEL,
+            "api_key_env": "OPENAI_API_KEY",
+            "max_tokens": DEFAULT_MAX_TOKENS,
+            "temperature": DEFAULT_TEMPERATURE,
+        },
+        "ollama": {
+            "model": DEFAULT_OLLAMA_MODEL,
+            "base_url": DEFAULT_OLLAMA_HOST,
+            "timeout": 60,
+        },
+    },
+    "storage": {
+        "database_path": str(get_user_data_dir() / "medical_bills.db"),
+        "pdf_storage_path": str(get_user_data_dir() / "pdfs"),
+    },
+    "bonus": {
+        "default_threshold": DEFAULT_BONUS_THRESHOLD,
+    },
+}

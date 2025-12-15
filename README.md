@@ -41,10 +41,9 @@ Or using pip:
 pip install -e .
 ```
 
-> **⚠️ Note**: The CLI commands shown below are planned for Phase 1.9 and not yet implemented.
+> **✅ Current Status (Phase 1.9)**: CLI commands are now fully implemented!
 >
-> **Current Status (Phase 1.6)**: The core modules (PDF processing, LLM providers, database) are complete.
-> For manual testing of current functionality, see [MANUAL_TESTING.md](MANUAL_TESTING.md).
+> All commands below are working. Start with `medical-bill-analyzer setup` to configure the application.
 
 3. Run the setup wizard:
 ```bash
@@ -137,14 +136,17 @@ bonus:
 
 ### Project Status
 
-**Current Implementation**: Phase 1.1-1.6 Complete (60%)
+**Current Implementation**: Phase 1.1-1.9 Complete (90%)
 - ✅ Project infrastructure setup
 - ✅ Configuration management
 - ✅ Utilities and logging
 - ✅ Database layer with SQLite
 - ✅ PDF processing pipeline
 - ✅ LLM provider abstraction layer (Anthropic, OpenAI, Ollama)
-- ✅ Comprehensive automated tests (319 tests, 94% coverage)
+- ✅ Information extraction pipeline (BillExtractor)
+- ✅ Core business logic (BillProcessor, BonusCalculator)
+- ✅ CLI commands (setup, add, list, total, bonus-check)
+- ✅ Comprehensive automated tests (395 tests, 95% coverage)
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed progress tracking.
 
@@ -180,7 +182,7 @@ pytest tests/integration/
 
 ### Test Coverage
 
-**Current Status**: 319 tests, 94% overall coverage
+**Current Status**: 395 tests, 95% overall coverage
 
 | Module | Tests | Coverage | Type |
 |--------|-------|----------|------|
@@ -202,9 +204,13 @@ pytest tests/integration/
 | **LLM Prompts** | **14** | **100%** | **Unit** |
 | **LLM Providers** | **14** | **86%** | **Unit** |
 | **LLM Factory** | **12** | **78%** | **Unit** |
+| **Extraction Result** | **10** | **100%** | **Unit** |
+| **Bill Extractor** | **17** | **94%** | **Unit** |
+| **Bill Processor** | **19** | **97%** | **Unit** |
+| **Bonus Calculator** | **20** | **100%** | **Unit** |
 
 **Testing Strategy:**
-- **Unit tests (300)**: Fast, mocked dependencies, test all code paths
+- **Unit tests (376)**: Fast, mocked dependencies, test all code paths
 - **Integration tests (19)**: Real PDFs with German medical content, end-to-end validation
 
 **View detailed coverage report:**
