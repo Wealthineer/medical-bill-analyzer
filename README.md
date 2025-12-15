@@ -138,7 +138,7 @@ bonus:
 - ✅ Utilities and logging
 - ✅ Database layer with SQLite
 - ✅ PDF processing pipeline
-- ✅ Comprehensive automated tests (232 tests, 92% coverage)
+- ✅ Comprehensive automated tests (251 tests, 93% coverage)
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed progress tracking.
 
@@ -162,25 +162,40 @@ pytest tests/unit/test_config/
 pytest tests/unit/test_utils/test_date_utils.py
 ```
 
+**Run only unit tests (fast):**
+```bash
+pytest tests/unit/
+```
+
+**Run only integration tests:**
+```bash
+pytest tests/integration/
+```
+
 ### Test Coverage
 
-**Current Status**: 232 tests, 92% overall coverage
+**Current Status**: 251 tests, 93% overall coverage
 
-| Module | Tests | Coverage |
-|--------|-------|----------|
-| Configuration | 15 | 91% |
-| File utilities | 17 | 96% |
-| Date utilities | 18 | 100% |
-| Currency utilities | 21 | 95% |
-| Validation | 18 | 93% |
-| Exceptions | 10 | 100% |
-| Database Models | 19 | 96% |
-| Database Connection | 16 | 96% |
-| Database Migrations | 20 | 87% |
-| Bill Repository | 41 | 99% |
-| PDF Extractor | 11 | 100% |
-| PDF Validator | 19 | 100% |
-| PDF Utils | 8 | 100% |
+| Module | Tests | Coverage | Type |
+|--------|-------|----------|------|
+| Configuration | 15 | 91% | Unit |
+| File utilities | 17 | 96% | Unit |
+| Date utilities | 18 | 100% | Unit |
+| Currency utilities | 21 | 95% | Unit |
+| Validation | 18 | 93% | Unit |
+| Exceptions | 10 | 100% | Unit |
+| Database Models | 19 | 96% | Unit |
+| Database Connection | 16 | 96% | Unit |
+| Database Migrations | 20 | 87% | Unit |
+| Bill Repository | 41 | 99% | Unit |
+| PDF Extractor | 11 | 100% | Unit |
+| PDF Validator | 19 | 100% | Unit |
+| PDF Utils | 8 | 100% | Unit |
+| **PDF Integration** | **19** | **100%** | **Integration** |
+
+**Testing Strategy:**
+- **Unit tests (232)**: Fast, mocked dependencies, test all code paths
+- **Integration tests (19)**: Real PDFs with German medical content, end-to-end validation
 
 **View detailed coverage report:**
 After running tests with coverage, open `htmlcov/index.html` in your browser:
@@ -196,13 +211,26 @@ start htmlcov/index.html  # Windows
 ```
 tests/
 ├── conftest.py              # Shared pytest fixtures
-├── unit/                    # Unit tests
+├── test_data/               # Test data files
+│   └── sample_bills/        # Sample German medical bill PDFs
+│       ├── valid_bill.pdf
+│       ├── multipage_bill.pdf
+│       ├── minimal_text.pdf
+│       └── empty_text.pdf
+├── unit/                    # Unit tests (232 tests, mocked)
 │   ├── test_config/         # Configuration module tests
 │   ├── test_utils/          # Utility function tests
 │   ├── test_core/           # Core module tests
 │   ├── test_database/       # Database layer tests
-│   └── test_pdf/            # PDF processing tests
-└── integration/             # Integration tests (future)
+│   └── test_pdf/            # PDF processing tests (mocked)
+└── integration/             # Integration tests (19 tests, real PDFs)
+    └── test_pdf_processing.py  # End-to-end PDF tests with real files
+```
+
+**Regenerating Test PDFs:**
+If needed, test PDFs can be regenerated:
+```bash
+python scripts/generate_test_pdfs.py
 ```
 
 ### Code Formatting

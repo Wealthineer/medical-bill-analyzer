@@ -131,7 +131,7 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 **Overall**: 10% complete (5/50 tasks)
 
 ### Testing Status
-- **Phase 1.1-1.5**: ✅ 232 tests, 92% coverage
+- **Phase 1.1-1.5**: ✅ 251 tests, 93% coverage
 - **Configuration**: 15 tests, 91% coverage
 - **Utilities**: 74 tests, 93-100% coverage (logger: 27% - deferred)
 - **Exceptions**: 10 tests, 100% coverage
@@ -140,10 +140,13 @@ This file tracks the overall implementation progress. Each phase has a detailed 
   - Connection: 16 tests, 96% coverage
   - Migrations: 20 tests, 87% coverage
   - BillRepository: 41 tests, 99% coverage
-- **PDF Processing**: 40 tests, 100% coverage
-  - Extractor: 11 tests, 100% coverage
-  - Validator: 19 tests, 100% coverage
-  - Utils: 8 tests, 100% coverage
+- **PDF Processing**: 59 tests total, 100% coverage
+  - Unit tests (40): Mocked, fast, all error paths
+  - Integration tests (19): Real German medical bill PDFs
+  - Extractor: 11 unit tests, 100% coverage
+  - Validator: 19 unit tests, 100% coverage
+  - Utils: 8 unit tests, 100% coverage
+  - End-to-end: 19 integration tests with real PDFs
 
 ---
 
@@ -166,14 +169,22 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 
 ## Recent Updates
 
+### 2025-12-15 - Integration Tests with Real PDFs Added ✅
+- Created 4 realistic German medical bill PDFs using reportlab library
+- Added scripts/generate_test_pdfs.py for PDF regeneration
+- Implemented 19 integration tests with real PDF files
+- Tests verify: German content extraction, umlauts, GOÄ codes, multi-page handling
+- Testing strategy: 40 unit tests (mocked) + 19 integration tests (real PDFs)
+- Total: 251 tests, 93% coverage (up from 232 tests, 92%)
+- PDF modules: 100% coverage with comprehensive test scenarios
+
 ### 2025-12-13 - Phase 1.5 PDF Processing Complete ✅
 - Implemented complete PDF processing pipeline with pdfplumber
 - Text extraction from single and multi-page PDFs
 - PDF validation with scanned document detection
 - Hash calculation and metadata extraction utilities
 - Comprehensive error handling (corrupted PDFs, password-protected, no text)
-- 40 automated tests with 100% coverage
-- Total test count: 232 tests, 92% overall coverage
+- 40 automated unit tests with 100% coverage
 - Fixed pdfminer exception imports (from pdfminer.pdfparser, not pdfplumber.pdfminer)
 
 ### 2025-12-13 - Database Layer Tests Complete ✅
@@ -210,4 +221,4 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 
 ---
 
-Last Updated: 2025-12-13
+Last Updated: 2025-12-15
