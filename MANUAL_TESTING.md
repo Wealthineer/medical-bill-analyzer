@@ -1,114 +1,62 @@
-# Manual Testing Guide - Phase 1.6
+# Manual Testing Guide
 
-This guide shows how to manually test the implemented modules at the current stage (Phase 1.6).
+**NOTE: This file is outdated. Phase 1.9 is now complete!**
 
-## Current Status
+For current testing instructions, see **[TESTING_GUIDE.md](TESTING_GUIDE.md)** which provides step-by-step instructions for testing the complete CLI application.
 
-✅ **Implemented:**
+---
+
+## Current Status (Phase 1.9 Complete)
+
+✅ **Fully Implemented:**
 - Configuration management
 - Database layer (SQLite)
 - PDF text extraction
 - LLM provider abstraction (Anthropic, OpenAI, Ollama)
+- Information extraction pipeline
+- Core business logic (BillProcessor, BonusCalculator)
+- **CLI commands (setup, add, list, total, bonus-check)**
 
-❌ **Not Yet Implemented:**
-- CLI commands (Phase 1.9)
-- Extraction pipeline (Phase 1.7)
-- Bill processor (Phase 1.8)
+## Quick Start
 
-## Setup for Manual Testing
+Instead of manual Python testing, you can now use the complete CLI:
 
-### 1. Set API Key
-
-Set your Anthropic API key as an environment variable:
-
+### 1. Run Setup Wizard
 ```bash
-# macOS/Linux
-export ANTHROPIC_API_KEY="sk-ant-your-key-here"
-
-# Windows (PowerShell)
-$env:ANTHROPIC_API_KEY="sk-ant-your-key-here"
-
-# Windows (CMD)
-set ANTHROPIC_API_KEY=sk-ant-your-key-here
+python -m medical_bill_analyzer setup
 ```
 
-Or create a `.env` file in the project root:
-```
-ANTHROPIC_API_KEY=sk-ant-your-key-here
-```
+This will guide you through:
+- LLM provider selection
+- API key configuration
+- Database initialization
 
-### 2. Use the Test Script
-
-We'll create a simple test script to try out the components:
-
+### 2. Test Adding Bills
 ```bash
-python scripts/test_llm_extraction.py
+python -m medical_bill_analyzer add tests/test_data/sample_bills/valid_bill.pdf
 ```
 
-## Manual Testing Workflow
-
-The test script will:
-1. Load a sample German medical bill PDF
-2. Extract text using pdfplumber
-3. Send to Anthropic Claude for extraction
-4. Parse and validate the response
-5. Display the extracted information
-
-## What to Look For
-
-### Expected Output:
-```
-Loading PDF: tests/test_data/sample_bills/valid_bill.pdf
-Extracted text: 245 characters
-
-Sending to Anthropic Claude...
-Response received successfully!
-
-Extracted Information:
-  Practitioner Name: Dr. med. Anna Müller
-  Practitioner Type: Arzt
-  Bill Date: 2024-03-15
-  Bill Number: 2024-001234
-  Total Amount: €29.49
-  Currency: EUR
-
-Validation: ✅ All fields valid
-```
-
-### Potential Issues:
-
-1. **API Key Error**: `401 Unauthorized`
-   - Check that ANTHROPIC_API_KEY is set correctly
-   - Verify the key is valid
-
-2. **Extraction Errors**: Missing or incorrect fields
-   - The prompt may need adjustment
-   - The PDF content may not match expected format
-
-3. **JSON Parsing Errors**: Invalid response format
-   - Claude may be wrapping JSON in markdown blocks (should auto-handle)
-   - Check the raw response in error output
-
-## Testing Other Providers
-
-### OpenAI (GPT)
+### 3. Test Other Commands
 ```bash
-export OPENAI_API_KEY="sk-your-key-here"
-# Edit scripts/test_llm_extraction.py to use "openai" provider
+# List all bills
+python -m medical_bill_analyzer list
+
+# Calculate total costs
+python -m medical_bill_analyzer total
+
+# Get bonus recommendation
+python -m medical_bill_analyzer bonus-check
 ```
 
-### Ollama (Local)
-```bash
-# Ensure Ollama is running: ollama serve
-# Pull a model: ollama pull llama3.1:8b
-# Edit scripts/test_llm_extraction.py to use "ollama" provider
-```
+## Full Testing Guide
 
-## Next Steps After Testing
+For comprehensive step-by-step testing instructions with expected outputs, troubleshooting, and all command variations, see:
 
-Once manual testing confirms the LLM extraction works:
-1. **Phase 1.7**: Build extraction pipeline (orchestrates PDF + LLM)
-2. **Phase 1.8**: Build bill processor (extraction + database storage)
-3. **Phase 1.9**: Build CLI commands (user-friendly interface)
+👉 **[TESTING_GUIDE.md](TESTING_GUIDE.md)**
 
-Then the usage shown in README.md will work!
+## Developer Testing
+
+If you want to test individual components programmatically, see:
+- `scripts/test_llm_extraction.py` - Test LLM extraction directly
+- `scripts/test_bill_extractor.py` - Test the complete extraction pipeline
+- `pytest` - Run the automated test suite (395 tests, 95% coverage)
