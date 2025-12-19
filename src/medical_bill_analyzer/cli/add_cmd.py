@@ -14,6 +14,7 @@ from medical_bill_analyzer.utils.logger import get_logger
 from .utils import (
     error_message,
     format_currency,
+    get_credential_repository,
     get_database_path,
     info_message,
     load_config,
@@ -60,7 +61,14 @@ def add(
 
     # Create components
     try:
-        llm_provider = create_llm_provider(settings.llm.provider, settings.llm.get_provider_config())
+        # Get credential repository for loading API keys
+        credential_repo = get_credential_repository(settings)
+
+        # Create LLM provider with credentials from database
+        llm_provider = create_llm_provider(
+            settings.llm.provider,
+            settings.llm.get_provider_config(credential_repo)
+        )
         extractor = BillExtractor(llm_provider)
         db_path = get_database_path(settings)
         repository = BillRepository(db_path)

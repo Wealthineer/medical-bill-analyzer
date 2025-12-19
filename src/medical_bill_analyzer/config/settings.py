@@ -27,28 +27,16 @@ class AnthropicConfig(BaseModel):
     """Anthropic Claude configuration."""
 
     model: str = DEFAULT_ANTHROPIC_MODEL
-    api_key_env: str = "ANTHROPIC_API_KEY"
     max_tokens: int = DEFAULT_MAX_TOKENS
     temperature: float = DEFAULT_TEMPERATURE
-
-    @property
-    def api_key(self) -> Optional[str]:
-        """Get API key from environment variable."""
-        return os.getenv(self.api_key_env)
 
 
 class OpenAIConfig(BaseModel):
     """OpenAI GPT configuration."""
 
     model: str = DEFAULT_OPENAI_MODEL
-    api_key_env: str = "OPENAI_API_KEY"
     max_tokens: int = DEFAULT_MAX_TOKENS
     temperature: float = DEFAULT_TEMPERATURE
-
-    @property
-    def api_key(self) -> Optional[str]:
-        """Get API key from environment variable."""
-        return os.getenv(self.api_key_env)
 
 
 class OllamaConfig(BaseModel):
@@ -67,21 +55,39 @@ class LLMConfig(BaseModel):
     openai: OpenAIConfig = Field(default_factory=OpenAIConfig)
     ollama: OllamaConfig = Field(default_factory=OllamaConfig)
 
-    def get_provider_config(self) -> dict:
-        """Get the active provider's configuration with API key resolved.
+    def get_provider_config(self, credential_repo) -> dict:
+        """Get the active provider's configuration with API key from database.
+
+        Args:
+            credential_repo: CredentialRepository instance for loading API keys
 
         Returns:
-            Dict with provider-specific config including resolved API key
+            Dict with provider-specific config including API key from database
+
+        Raises:
+            ValueError: If API key not found in database for cloud providers
         """
         if self.provider == "anthropic":
             config = self.anthropic.model_dump()
-            config["api_key"] = self.anthropic.api_key
+            api_key = credential_repo.get_credential("anthropic")
+            if not api_key:
+                raise ValueError(
+                    "Anthropic API key not found in database. "
+                    "Please run 'medical-bill-analyzer setup' to configure credentials."
+                )
+            config["api_key"] = api_key
             return config
         elif self.provider == "openai":
             config = self.openai.model_dump()
-            config["api_key"] = self.openai.api_key
+            api_key = credential_repo.get_credential("openai")
+            if not api_key:
+                raise ValueError(
+                    "OpenAI API key not found in database. "
+                    "Please run 'medical-bill-analyzer setup' to configure credentials."
+                )
+            config["api_key"] = api_key
             return config
-        else:  # ollama
+        else:  # ollama (local, no API key needed)
             return self.ollama.model_dump()
 
 

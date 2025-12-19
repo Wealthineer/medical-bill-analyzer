@@ -42,11 +42,10 @@ def setup():
     provider_name = _select_llm_provider()
 
     # Step 2: Get API key (if needed)
-    api_key_env = _setup_api_key(provider_name)
+    api_key = _setup_api_key(provider_name)
 
     # Step 3: Test connection
-    config = _create_test_config(provider_name, api_key_env)
-    if not _test_llm_connection(provider_name, config):
+    if not _test_llm_connection(provider_name, api_key):
         error_message("Setup failed: Could not connect to LLM provider")
         raise typer.Exit(code=1)
 
@@ -54,10 +53,13 @@ def setup():
     bonus_threshold = _set_bonus_threshold()
 
     # Step 5: Initialize database
-    db_path = _initialize_database(config)
+    db_path = _initialize_database()
 
-    # Step 6: Create config file
-    _save_configuration(config, provider_name, api_key_env, bonus_threshold)
+    # Step 6: Save credential to database
+    _save_credential(db_path, provider_name, api_key)
+
+    # Step 7: Save configuration
+    _save_configuration(provider_name, bonus_threshold)
 
     # Success!
     typer.echo("\n" + "=" * 60)
@@ -77,37 +79,6 @@ def _show_privacy_notice():
     typer.echo("  • Only extracted TEXT is sent to the LLM API (not PDF files)")
     typer.echo("  • For complete privacy, use Ollama (local processing)")
     typer.echo()
-
-
-def _save_api_key_to_env(env_file: Path, key_name: str, key_value: str):
-    """Save or update API key in .env file.
-
-    Args:
-        env_file: Path to .env file
-        key_name: Environment variable name (e.g., "ANTHROPIC_API_KEY")
-        key_value: API key value
-    """
-    # Read existing .env file if it exists
-    existing_lines = []
-    key_exists = False
-
-    if env_file.exists():
-        with open(env_file, "r") as f:
-            for line in f:
-                # Update existing key or keep other lines
-                if line.strip().startswith(f"{key_name}="):
-                    existing_lines.append(f'{key_name}="{key_value}"\n')
-                    key_exists = True
-                else:
-                    existing_lines.append(line)
-
-    # If key doesn't exist, add it
-    if not key_exists:
-        existing_lines.append(f'{key_name}="{key_value}"\n')
-
-    # Write back to .env file
-    with open(env_file, "w") as f:
-        f.writelines(existing_lines)
 
 
 def _select_llm_provider() -> str:
@@ -146,45 +117,34 @@ def _select_llm_provider() -> str:
             error_message("Invalid choice. Please enter 1, 2, or 3")
 
 
-def _setup_api_key(provider_name: str) -> str:
+def _setup_api_key(provider_name: str) -> Optional[str]:
     """Setup API key for provider.
 
     Args:
         provider_name: Name of provider
 
     Returns:
-        Environment variable name for API key
+        API key value (None for ollama which runs locally)
     """
     typer.secho("Step 2: API Key Configuration", fg=typer.colors.CYAN, bold=True)
     typer.echo()
 
-    env_var_map = {
-        "anthropic": "ANTHROPIC_API_KEY",
-        "openai": "OPENAI_API_KEY",
-        "ollama": None,
-    }
-
-    api_key_env = env_var_map.get(provider_name)
-
-    if api_key_env is None:
+    # Ollama runs locally, no API key needed
+    if provider_name == "ollama":
         info_message("Ollama runs locally - no API key needed")
         typer.echo()
-        return ""
-
-    # Check if already set
-    existing_key = os.getenv(api_key_env)
-    if existing_key:
-        success_message(f"API key found in environment: {api_key_env}")
-        typer.echo()
-        return api_key_env
+        return None
 
     # Prompt user to enter API key
     typer.echo(f"Enter your {provider_name.title()} API key:")
-    typer.echo(f"(Get your key from: https://console.{provider_name}.com)")
+    if provider_name == "anthropic":
+        typer.echo("(Get your key from: https://console.anthropic.com)")
+    elif provider_name == "openai":
+        typer.echo("(Get your key from: https://platform.openai.com)")
     typer.echo()
 
     api_key = typer.prompt(
-        f"{api_key_env}",
+        "API Key",
         hide_input=True,
         confirmation_prompt=False,
     ).strip()
@@ -193,73 +153,47 @@ def _setup_api_key(provider_name: str) -> str:
         error_message("API key cannot be empty")
         raise typer.Exit(code=1)
 
-    # Save to .env file
-    env_file = Path.cwd() / ".env"
-    _save_api_key_to_env(env_file, api_key_env, api_key)
-
-    # Set in current environment for this session
-    os.environ[api_key_env] = api_key
-
-    success_message(f"API key saved to {env_file}")
+    success_message("API key received - will be saved to database")
     typer.echo()
-    return api_key_env
+    return api_key
 
 
-def _create_test_config(provider_name: str, api_key_env: str) -> dict:
-    """Create test configuration for provider.
-
-    Args:
-        provider_name: Name of provider
-        api_key_env: Environment variable name
-
-    Returns:
-        Config dict for provider
-    """
-    default_llm_config = DEFAULT_CONFIG["llm"]
-
-    if provider_name == "anthropic":
-        return {
-            "provider": "anthropic",
-            "anthropic": {
-                "model": default_llm_config["anthropic"]["model"],
-                "api_key_env": api_key_env,
-                "max_tokens": default_llm_config["anthropic"]["max_tokens"],
-                "temperature": default_llm_config["anthropic"]["temperature"],
-            },
-        }
-    elif provider_name == "openai":
-        return {
-            "provider": "openai",
-            "openai": {
-                "model": default_llm_config["openai"]["model"],
-                "api_key_env": api_key_env,
-                "max_tokens": default_llm_config["openai"]["max_tokens"],
-                "temperature": default_llm_config["openai"]["temperature"],
-            },
-        }
-    else:  # ollama
-        return {
-            "provider": "ollama",
-            "ollama": {
-                "model": default_llm_config["ollama"]["model"],
-                "base_url": default_llm_config["ollama"]["base_url"],
-                "timeout": default_llm_config["ollama"]["timeout"],
-            },
-        }
-
-
-def _test_llm_connection(provider_name: str, config: dict) -> bool:
+def _test_llm_connection(provider_name: str, api_key: Optional[str]) -> bool:
     """Test LLM provider connection.
 
     Args:
         provider_name: Name of provider
-        config: Provider config
+        api_key: API key (None for ollama)
 
     Returns:
         True if successful, False otherwise
     """
     typer.secho("Step 3: Testing Connection", fg=typer.colors.CYAN, bold=True)
     typer.echo()
+
+    # Build provider config
+    default_llm_config = DEFAULT_CONFIG["llm"]
+
+    if provider_name == "anthropic":
+        config = {
+            "model": default_llm_config["anthropic"]["model"],
+            "api_key": api_key,
+            "max_tokens": default_llm_config["anthropic"]["max_tokens"],
+            "temperature": default_llm_config["anthropic"]["temperature"],
+        }
+    elif provider_name == "openai":
+        config = {
+            "model": default_llm_config["openai"]["model"],
+            "api_key": api_key,
+            "max_tokens": default_llm_config["openai"]["max_tokens"],
+            "temperature": default_llm_config["openai"]["temperature"],
+        }
+    else:  # ollama
+        config = {
+            "model": default_llm_config["ollama"]["model"],
+            "base_url": default_llm_config["ollama"]["base_url"],
+            "timeout": default_llm_config["ollama"]["timeout"],
+        }
 
     with typer.progressbar(length=1, label="Testing LLM connection") as progress:
         try:
@@ -314,11 +248,8 @@ def _set_bonus_threshold() -> Decimal:
             error_message("Invalid number format")
 
 
-def _initialize_database(config: dict) -> Path:
+def _initialize_database() -> Path:
     """Initialize database with migrations.
-
-    Args:
-        config: Application config
 
     Returns:
         Database path
@@ -332,7 +263,7 @@ def _initialize_database(config: dict) -> Path:
 
     with typer.progressbar(length=1, label="Creating database") as progress:
         try:
-            # Create connection and run migrations
+            # Create connection and run migrations (including v2 for credentials)
             db = DatabaseConnection(db_path)
             manager = MigrationManager(db)
             manager.run_migrations()
@@ -350,29 +281,55 @@ def _initialize_database(config: dict) -> Path:
             raise typer.Exit(code=1)
 
 
-def _save_configuration(
-    config: dict,
-    provider_name: str,
-    api_key_env: str,
-    bonus_threshold: Decimal,
-):
+def _save_credential(db_path: Path, provider_name: str, api_key: Optional[str]):
+    """Save credential to database.
+
+    Args:
+        db_path: Path to database
+        provider_name: Provider name
+        api_key: API key (None for ollama)
+    """
+    typer.secho("Step 6: Saving Credentials", fg=typer.colors.CYAN, bold=True)
+    typer.echo()
+
+    with typer.progressbar(length=1, label="Saving credentials to database") as progress:
+        try:
+            from medical_bill_analyzer.database.repositories import CredentialRepository
+
+            credential_repo = CredentialRepository(db_path)
+            credential_repo.save_credential(provider_name, api_key)
+
+            progress.update(1)
+            typer.echo()
+            success_message(f"Credentials saved securely to database")
+            typer.echo()
+
+        except Exception as e:
+            progress.update(1)
+            typer.echo()
+            error_message(f"Failed to save credentials: {e}")
+            raise typer.Exit(code=1)
+
+
+def _save_configuration(provider_name: str, bonus_threshold: Decimal):
     """Save configuration to file.
 
     Args:
-        config: LLM config
         provider_name: Provider name
-        api_key_env: API key environment variable
         bonus_threshold: Bonus threshold
     """
-    typer.secho("Step 6: Saving Configuration", fg=typer.colors.CYAN, bold=True)
+    typer.secho("Step 7: Saving Configuration", fg=typer.colors.CYAN, bold=True)
     typer.echo()
 
     config_path = get_config_path()
     config_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Build full config
+    # Build full config from defaults
     full_config = {
-        "llm": config,
+        "llm": {
+            "provider": provider_name,
+            **DEFAULT_CONFIG["llm"],  # Includes all provider configs
+        },
         "storage": DEFAULT_CONFIG["storage"],
         "bonus": {
             "default_threshold": float(bonus_threshold),

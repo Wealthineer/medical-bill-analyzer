@@ -7,7 +7,7 @@ This guide will walk you through testing the complete application end-to-end.
 1. **Have your API key ready** (if using Anthropic or OpenAI):
    - Get an Anthropic API key from: https://console.anthropic.com
    - Or get an OpenAI API key from: https://platform.openai.com
-   - The setup wizard will prompt you to enter it interactively
+   - The setup wizard will prompt you to enter it and save it securely to the database
 
 2. **Have a German medical bill PDF ready** (or use one of the test PDFs):
    ```bash
@@ -26,15 +26,17 @@ python -m medical_bill_analyzer setup
 **What to expect:**
 - Welcome message and privacy notice
 - Provider selection (1=Anthropic, 2=OpenAI, 3=Ollama)
-- **API key prompt** (enter your API key when prompted - it will be saved to `.env` file)
+- **API key prompt** (enter your API key when prompted - it will be saved securely to the database)
 - Connection test with progress bar
 - Bonus threshold prompt (default: 1000 EUR)
 - Database initialization
+- Credentials saved to database
 - Config file saved to `~/.medical-bill-analyzer/config.yaml`
 
 **Output should show:**
 - ✓ Connected successfully
 - ✓ Database initialized
+- ✓ Credentials saved securely to database
 - ✓ Configuration saved
 - Next steps instructions
 
@@ -232,10 +234,11 @@ By not submitting claims, you save €250.00.
 
 ### "API key not found" or "Connection failed"
 - The setup wizard should have prompted you to enter your API key
-- Your API key is saved in `.env` file in the project root
-- If you need to update it, either:
-  - Delete the `.env` file and run setup again, OR
-  - Manually edit the `.env` file with your correct key
+- Your API key is saved securely in the database (`~/.medical-bill-analyzer/data/medical_bills.db`)
+- If you need to update it, run the setup wizard again:
+  ```bash
+  python -m medical_bill_analyzer setup
+  ```
 - For Ollama: Make sure Ollama is running (`ollama serve`)
 
 ### "No bills found"
@@ -245,11 +248,12 @@ By not submitting claims, you save €250.00.
 
 ## Database and Config Locations
 
-- **API Keys**: `.env` (in project root)
 - **Config**: `~/.medical-bill-analyzer/config.yaml`
-- **Database**: `~/.medical-bill-analyzer/data/medical_bills.db`
+- **Database** (including API keys): `~/.medical-bill-analyzer/data/medical_bills.db`
 - **PDF Storage**: `~/.medical-bill-analyzer/data/pdfs/`
 - **Logs**: `~/.medical-bill-analyzer/logs/`
+
+**Note**: API keys are stored securely in the database, not in environment variables or separate files.
 
 To reset everything, simply delete the `.medical-bill-analyzer` directory:
 ```bash

@@ -49,13 +49,11 @@ DEFAULT_CONFIG = {
         "provider": DEFAULT_LLM_PROVIDER,
         "anthropic": {
             "model": DEFAULT_ANTHROPIC_MODEL,
-            "api_key_env": "ANTHROPIC_API_KEY",
             "max_tokens": DEFAULT_MAX_TOKENS,
             "temperature": DEFAULT_TEMPERATURE,
         },
         "openai": {
             "model": DEFAULT_OPENAI_MODEL,
-            "api_key_env": "OPENAI_API_KEY",
             "max_tokens": DEFAULT_MAX_TOKENS,
             "temperature": DEFAULT_TEMPERATURE,
         },

@@ -53,6 +53,21 @@ def get_database_path(settings: Optional[Settings] = None) -> Path:
     return Path(settings.storage.database_path).expanduser()
 
 
+def get_credential_repository(settings: Optional[Settings] = None):
+    """Get credential repository.
+
+    Args:
+        settings: Optional settings object (loads if not provided)
+
+    Returns:
+        CredentialRepository instance
+    """
+    from medical_bill_analyzer.database.repositories import CredentialRepository
+
+    db_path = get_database_path(settings)
+    return CredentialRepository(db_path)
+
+
 def format_currency(amount: float) -> str:
     """Format amount as EUR currency.
 

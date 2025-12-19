@@ -114,9 +114,16 @@ llm:
   provider: anthropic  # Options: anthropic, openai, ollama
   anthropic:
     model: claude-sonnet-4-20250514
-    api_key_env: ANTHROPIC_API_KEY
     max_tokens: 1000
     temperature: 0
+  openai:
+    model: gpt-4o-mini
+    max_tokens: 1000
+    temperature: 0
+  ollama:
+    model: llama3.1:8b
+    base_url: http://localhost:11434
+    timeout: 60
 
 storage:
   database_path: ~/.medical-bill-analyzer/data/medical_bills.db
@@ -126,9 +133,12 @@ bonus:
   default_threshold: 1000  # EUR
 ```
 
+**Note**: API keys are stored securely in the database, not in the config file. The setup wizard prompts you to enter your API key and saves it to the database.
+
 ## Data Privacy
 
-- **Local Storage**: All PDFs and extracted data are stored locally on your machine
+- **Local Storage**: All PDFs, extracted data, and API keys are stored locally on your machine in `~/.medical-bill-analyzer/`
+- **API Keys**: Stored securely in the local SQLite database (not in environment variables or config files)
 - **Cloud LLM Providers**: Only the extracted text is sent to the LLM API (not the PDF file itself)
 - **Local Option**: Use Ollama for completely local processing with no data sent to external services
 
