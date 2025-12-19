@@ -4,12 +4,10 @@ This guide will walk you through testing the complete application end-to-end.
 
 ## Prerequisites
 
-1. **Set your API key** (if using Anthropic or OpenAI):
-   ```bash
-   export ANTHROPIC_API_KEY=your-api-key-here
-   # OR
-   export OPENAI_API_KEY=your-api-key-here
-   ```
+1. **Have your API key ready** (if using Anthropic or OpenAI):
+   - Get an Anthropic API key from: https://console.anthropic.com
+   - Or get an OpenAI API key from: https://platform.openai.com
+   - The setup wizard will prompt you to enter it interactively
 
 2. **Have a German medical bill PDF ready** (or use one of the test PDFs):
    ```bash
@@ -28,7 +26,7 @@ python -m medical_bill_analyzer setup
 **What to expect:**
 - Welcome message and privacy notice
 - Provider selection (1=Anthropic, 2=OpenAI, 3=Ollama)
-- API key verification
+- **API key prompt** (enter your API key when prompted - it will be saved to `.env` file)
 - Connection test with progress bar
 - Bonus threshold prompt (default: 1000 EUR)
 - Database initialization
@@ -232,14 +230,12 @@ By not submitting claims, you save €250.00.
 ### "Configuration error"
 - Run `python -m medical_bill_analyzer setup` first
 
-### "API key not found"
-- Make sure you've exported the environment variable:
-  ```bash
-  export ANTHROPIC_API_KEY=your-key
-  ```
-
-### "Connection failed"
-- Check your API key is correct
+### "API key not found" or "Connection failed"
+- The setup wizard should have prompted you to enter your API key
+- Your API key is saved in `.env` file in the project root
+- If you need to update it, either:
+  - Delete the `.env` file and run setup again, OR
+  - Manually edit the `.env` file with your correct key
 - For Ollama: Make sure Ollama is running (`ollama serve`)
 
 ### "No bills found"
@@ -249,6 +245,7 @@ By not submitting claims, you save €250.00.
 
 ## Database and Config Locations
 
+- **API Keys**: `.env` (in project root)
 - **Config**: `~/.medical-bill-analyzer/config.yaml`
 - **Database**: `~/.medical-bill-analyzer/data/medical_bills.db`
 - **PDF Storage**: `~/.medical-bill-analyzer/data/pdfs/`

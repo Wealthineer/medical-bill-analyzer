@@ -79,6 +79,37 @@ def _show_privacy_notice():
     typer.echo()
 
 
+def _save_api_key_to_env(env_file: Path, key_name: str, key_value: str):
+    """Save or update API key in .env file.
+
+    Args:
+        env_file: Path to .env file
+        key_name: Environment variable name (e.g., "ANTHROPIC_API_KEY")
+        key_value: API key value
+    """
+    # Read existing .env file if it exists
+    existing_lines = []
+    key_exists = False
+
+    if env_file.exists():
+        with open(env_file, "r") as f:
+            for line in f:
+                # Update existing key or keep other lines
+                if line.strip().startswith(f"{key_name}="):
+                    existing_lines.append(f'{key_name}="{key_value}"\n')
+                    key_exists = True
+                else:
+                    existing_lines.append(line)
+
+    # If key doesn't exist, add it
+    if not key_exists:
+        existing_lines.append(f'{key_name}="{key_value}"\n')
+
+    # Write back to .env file
+    with open(env_file, "w") as f:
+        f.writelines(existing_lines)
+
+
 def _select_llm_provider() -> str:
     """Prompt user to select LLM provider.
 
@@ -141,20 +172,37 @@ def _setup_api_key(provider_name: str) -> str:
         return ""
 
     # Check if already set
-    if os.getenv(api_key_env):
+    existing_key = os.getenv(api_key_env)
+    if existing_key:
         success_message(f"API key found in environment: {api_key_env}")
         typer.echo()
         return api_key_env
 
-    # Prompt for API key
-    typer.echo(f"Set your API key in environment variable: {api_key_env}")
-    typer.echo()
-    warning_message("Please set the API key and re-run setup:")
-    typer.echo(f"  export {api_key_env}=your-key-here")
+    # Prompt user to enter API key
+    typer.echo(f"Enter your {provider_name.title()} API key:")
+    typer.echo(f"(Get your key from: https://console.{provider_name}.com)")
     typer.echo()
 
-    error_message(f"API key not found: {api_key_env}")
-    raise typer.Exit(code=1)
+    api_key = typer.prompt(
+        f"{api_key_env}",
+        hide_input=True,
+        confirmation_prompt=False,
+    ).strip()
+
+    if not api_key:
+        error_message("API key cannot be empty")
+        raise typer.Exit(code=1)
+
+    # Save to .env file
+    env_file = Path.cwd() / ".env"
+    _save_api_key_to_env(env_file, api_key_env, api_key)
+
+    # Set in current environment for this session
+    os.environ[api_key_env] = api_key
+
+    success_message(f"API key saved to {env_file}")
+    typer.echo()
+    return api_key_env
 
 
 def _create_test_config(provider_name: str, api_key_env: str) -> dict:
