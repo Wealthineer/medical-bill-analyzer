@@ -14,4 +14,5 @@ CREATE TABLE IF NOT EXISTS credentials (
 CREATE INDEX IF NOT EXISTS idx_credentials_provider ON credentials(provider);
 
 -- Update schema version
-UPDATE schema_version SET version = 2 WHERE id = 1;
+INSERT OR REPLACE INTO schema_version (version, description, applied_at)
+VALUES (2, 'Add credentials table for API key storage', CURRENT_TIMESTAMP);

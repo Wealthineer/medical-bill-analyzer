@@ -80,7 +80,7 @@ class TestLLMConfig:
         config = LLMConfig(provider="anthropic")
         assert config.provider == "anthropic"
         assert config.anthropic.model == "claude-sonnet-4-20250514"
-        assert config.anthropic.api_key_env == "ANTHROPIC_API_KEY"
+        # Note: API keys are now stored in database, not environment variables
 
     def test_openai_config(self):
         """Test OpenAI configuration."""
@@ -92,22 +92,34 @@ class TestLLMConfig:
         """Test Ollama configuration."""
         config = LLMConfig(provider="ollama")
         assert config.provider == "ollama"
-        assert config.ollama.host == "http://localhost:11434"
+        assert config.ollama.base_url == "http://localhost:11434"
         assert config.ollama.model == "llama3.1:8b"
 
-    def test_api_key_from_env(self, monkeypatch):
-        """Test API key retrieval from environment."""
-        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-123")
+    def test_get_provider_config_with_credentials(self, initialized_db):
+        """Test get_provider_config loads credentials from database."""
+        from medical_bill_analyzer.database.repositories import CredentialRepository
+
+        # Setup: save credential to database
+        credential_repo = CredentialRepository(initialized_db)
+        credential_repo.save_credential("anthropic", "test-api-key-123")
+
+        # Test: get provider config
+        config = LLMConfig(provider="anthropic")
+        provider_config = config.get_provider_config(credential_repo)
+
+        assert provider_config["api_key"] == "test-api-key-123"
+        assert provider_config["model"] == "claude-sonnet-4-20250514"
+
+    def test_get_provider_config_missing_credentials(self, initialized_db):
+        """Test get_provider_config raises error when credentials missing."""
+        from medical_bill_analyzer.database.repositories import CredentialRepository
+
+        credential_repo = CredentialRepository(initialized_db)
 
         config = LLMConfig(provider="anthropic")
-        assert config.anthropic.api_key == "test-key-123"
 
-    def test_api_key_missing(self):
-        """Test API key when not in environment."""
-        config = LLMConfig(provider="anthropic")
-        # Should return None if not set
-        # (Don't check actual env var in case it's set)
-        assert config.anthropic.api_key is None or isinstance(config.anthropic.api_key, str)
+        with pytest.raises(ValueError, match="API key not found"):
+            config.get_provider_config(credential_repo)
 
 
 class TestStorageConfig:

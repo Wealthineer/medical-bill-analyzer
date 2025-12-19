@@ -35,7 +35,8 @@ class TestMigrationManager:
         with db.get_connection() as conn:
             version = manager.get_current_version(conn)
 
-        assert version == 1
+        # After initialization, all available migrations are applied (v1 and v2)
+        assert version == 2
 
     def test_get_available_migrations(self, test_db_path):
         """Test get_available_migrations finds migration files."""
@@ -77,14 +78,14 @@ class TestMigrationManager:
 
         count = manager.migrate()
 
-        assert count >= 1
+        assert count >= 2  # Should apply v1 and v2 migrations
         assert Path(test_db_path).exists()
 
-        # Verify schema version updated
+        # Verify schema version updated to latest
         db = DatabaseConnection(test_db_path)
         with db.get_connection() as conn:
             version = manager.get_current_version(conn)
-        assert version == 1
+        assert version == 2
 
     def test_migrate_already_migrated(self, initialized_db):
         """Test migrate on already migrated database does nothing."""
@@ -200,7 +201,8 @@ class TestSchemaFunctions:
         """Test get_schema_version function."""
         version = get_schema_version(initialized_db)
 
-        assert version == 1
+        # After initialization, latest schema version (v2) is applied
+        assert version == 2
 
     def test_get_schema_version_uninitialized(self, temp_dir):
         """Test get_schema_version returns 0 for uninitialized database."""

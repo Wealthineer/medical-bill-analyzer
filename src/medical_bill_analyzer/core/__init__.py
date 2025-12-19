@@ -1,7 +1,10 @@
 """Core business logic and exceptions."""
 
-from .bill_processor import BillProcessor, ProcessingResult
-from .bonus_calculator import BonusCalculator, BonusRecommendation
+# Note: BillProcessor and BonusCalculator are not imported here to avoid
+# circular imports. Import them directly from their modules:
+#   from medical_bill_analyzer.core.bill_processor import BillProcessor
+#   from medical_bill_analyzer.core.bonus_calculator import BonusCalculator
+
 from .exceptions import (
     ConfigError,
     DatabaseError,
@@ -14,11 +17,6 @@ from .exceptions import (
 )
 
 __all__ = [
-    # Business logic
-    "BillProcessor",
-    "ProcessingResult",
-    "BonusCalculator",
-    "BonusRecommendation",
     # Exceptions
     "MedicalBillAnalyzerError",
     "ConfigError",
