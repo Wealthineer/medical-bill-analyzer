@@ -104,6 +104,24 @@ medical-bill-analyzer bonus-check
 medical-bill-analyzer bonus-check --threshold 1000
 ```
 
+### View spending statistics
+```bash
+# Show all practitioners by spending
+medical-bill-analyzer stats --by practitioner
+
+# Show top 10 practitioners
+medical-bill-analyzer stats --by practitioner --top 10
+
+# Show category breakdown for 2024
+medical-bill-analyzer stats --by category --year 2024
+
+# Show monthly trends
+medical-bill-analyzer stats --by month --year 2024
+
+# Filter by practitioner type
+medical-bill-analyzer stats --by practitioner --type Zahnarzt
+```
+
 ## Configuration
 
 The application stores configuration in `~/.medical-bill-analyzer/config.yaml` (or `%APPDATA%/medical-bill-analyzer/config.yaml` on Windows).
@@ -146,7 +164,9 @@ bonus:
 
 ### Project Status
 
-**Current Implementation**: Phase 1 Complete (100%) - MVP Ready!
+**Current Implementation**: Phase 2 Complete (100%) - Enhanced Analytics Ready!
+
+**Phase 1 (Complete)**: Core Functionality (MVP)
 - ✅ Project infrastructure setup
 - ✅ Configuration management
 - ✅ Utilities and logging
@@ -157,7 +177,13 @@ bonus:
 - ✅ Core business logic (BillProcessor, BonusCalculator)
 - ✅ CLI commands (setup, add, list, total, bonus-check)
 - ✅ Database credential storage (Phase 4b ready)
-- ✅ Comprehensive automated tests (385 tests, 64% coverage)
+
+**Phase 2 (Complete)**: Enhanced Analytics
+- ✅ Practitioner-level spending statistics
+- ✅ Category breakdown with percentages
+- ✅ Monthly time-series analysis
+- ✅ CLI stats command with Rich tables
+- ✅ Comprehensive testing (440 tests, 62% coverage)
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed progress tracking.
 
@@ -193,7 +219,7 @@ pytest tests/integration/
 
 ### Test Coverage
 
-**Current Status**: 395 tests, 95% overall coverage
+**Current Status**: 440 tests, 62% overall coverage
 
 | Module | Tests | Coverage | Type |
 |--------|-------|----------|------|
@@ -219,10 +245,15 @@ pytest tests/integration/
 | **Bill Extractor** | **17** | **94%** | **Unit** |
 | **Bill Processor** | **19** | **97%** | **Unit** |
 | **Bonus Calculator** | **20** | **100%** | **Unit** |
+| **Analytics Models** | **18** | **98%** | **Unit** |
+| **Analytics Engine** | **23** | **100%** | **Unit** |
+| **Analytics Integration** | **14** | **98%** | **Integration** |
 
 **Testing Strategy:**
-- **Unit tests (376)**: Fast, mocked dependencies, test all code paths
-- **Integration tests (19)**: Real PDFs with German medical content, end-to-end validation
+- **Unit tests (407)**: Fast, mocked dependencies, test all code paths
+- **Integration tests (33)**: Real PDFs and database, end-to-end validation
+  - PDF integration: 19 tests with real German medical bill PDFs
+  - Analytics integration: 14 tests with real database queries
 
 **View detailed coverage report:**
 After running tests with coverage, open `htmlcov/index.html` in your browser:

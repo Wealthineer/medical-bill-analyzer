@@ -447,6 +447,251 @@ class BillRepository(BaseRepository[Bill]):
 
         return Decimal(str(total))
 
+    def get_practitioner_stats(
+        self,
+        filter_criteria: Optional[BillFilter] = None,
+    ) -> List[dict]:
+        """Get aggregated statistics grouped by practitioner.
+
+        Args:
+            filter_criteria: Optional filter criteria (year, date range, type)
+
+        Returns:
+            List of dicts with practitioner statistics, sorted by total_amount descending
+
+        Example:
+            >>> filter_obj = BillFilter(year=2024)
+            >>> stats = repository.get_practitioner_stats(filter_obj)
+            >>> for stat in stats:
+            ...     print(f"{stat['practitioner_name']}: €{stat['total_amount']}")
+        """
+        conditions = []
+        params = []
+
+        # Build WHERE clause using same logic as get_total_amount
+        if filter_criteria:
+            # Year filter
+            if filter_criteria.year:
+                start = date(filter_criteria.year, 1, 1)
+                end = date(filter_criteria.year, 12, 31)
+                conditions.append("bill_date >= ? AND bill_date <= ?")
+                params.extend([start, end])
+
+            # Date range filter
+            if filter_criteria.start_date:
+                conditions.append("bill_date >= ?")
+                params.append(filter_criteria.start_date)
+
+            if filter_criteria.end_date:
+                conditions.append("bill_date <= ?")
+                params.append(filter_criteria.end_date)
+
+            # Practitioner type filter
+            if filter_criteria.practitioner_type:
+                conditions.append("practitioner_type = ?")
+                params.append(filter_criteria.practitioner_type)
+
+            # Status filter
+            if filter_criteria.extraction_status:
+                conditions.append("extraction_status = ?")
+                params.append(filter_criteria.extraction_status)
+
+        # Build SQL query
+        sql = """
+            SELECT
+                practitioner_name,
+                practitioner_type,
+                COUNT(*) as bill_count,
+                SUM(total_amount) as total_amount,
+                AVG(total_amount) as average_amount,
+                MIN(bill_date) as first_visit,
+                MAX(bill_date) as last_visit
+            FROM bills
+        """
+        if conditions:
+            sql += " WHERE " + " AND ".join(conditions)
+
+        sql += """
+            GROUP BY practitioner_name, practitioner_type
+            ORDER BY total_amount DESC
+        """
+
+        with self.db.get_connection() as conn:
+            cursor = conn.execute(sql, tuple(params))
+            rows = cursor.fetchall()
+
+        # Convert to list of dicts with proper types
+        return [
+            {
+                "practitioner_name": row[0],
+                "practitioner_type": row[1],
+                "bill_count": row[2],
+                "total_amount": Decimal(str(row[3])),
+                "average_amount": Decimal(str(row[4])),
+                "first_visit": date.fromisoformat(row[5]) if row[5] else None,
+                "last_visit": date.fromisoformat(row[6]) if row[6] else None,
+            }
+            for row in rows
+        ]
+
+    def get_category_stats(
+        self,
+        filter_criteria: Optional[BillFilter] = None,
+    ) -> List[dict]:
+        """Get aggregated statistics grouped by practitioner category/type.
+
+        Args:
+            filter_criteria: Optional filter criteria (year, date range)
+
+        Returns:
+            List of dicts with category statistics, sorted by total_amount descending
+
+        Example:
+            >>> stats = repository.get_category_stats()
+            >>> for stat in stats:
+            ...     print(f"{stat['category']}: {stat['bill_count']} bills, €{stat['total_amount']}")
+        """
+        conditions = []
+        params = []
+
+        # Build WHERE clause using same logic as get_total_amount
+        if filter_criteria:
+            # Year filter
+            if filter_criteria.year:
+                start = date(filter_criteria.year, 1, 1)
+                end = date(filter_criteria.year, 12, 31)
+                conditions.append("bill_date >= ? AND bill_date <= ?")
+                params.extend([start, end])
+
+            # Date range filter
+            if filter_criteria.start_date:
+                conditions.append("bill_date >= ?")
+                params.append(filter_criteria.start_date)
+
+            if filter_criteria.end_date:
+                conditions.append("bill_date <= ?")
+                params.append(filter_criteria.end_date)
+
+            # Status filter
+            if filter_criteria.extraction_status:
+                conditions.append("extraction_status = ?")
+                params.append(filter_criteria.extraction_status)
+
+        # Build SQL query - group by practitioner_type only
+        sql = """
+            SELECT
+                COALESCE(practitioner_type, 'Unknown') as category,
+                COUNT(*) as bill_count,
+                SUM(total_amount) as total_amount,
+                AVG(total_amount) as average_amount
+            FROM bills
+        """
+        if conditions:
+            sql += " WHERE " + " AND ".join(conditions)
+
+        sql += """
+            GROUP BY practitioner_type
+            ORDER BY total_amount DESC
+        """
+
+        with self.db.get_connection() as conn:
+            cursor = conn.execute(sql, tuple(params))
+            rows = cursor.fetchall()
+
+        # Convert to list of dicts with proper types
+        return [
+            {
+                "category": row[0],
+                "bill_count": row[1],
+                "total_amount": Decimal(str(row[2])),
+                "average_amount": Decimal(str(row[3])),
+            }
+            for row in rows
+        ]
+
+    def get_monthly_stats(
+        self,
+        filter_criteria: Optional[BillFilter] = None,
+    ) -> List[dict]:
+        """Get aggregated statistics grouped by month.
+
+        Args:
+            filter_criteria: Optional filter criteria (year, date range, type)
+
+        Returns:
+            List of dicts with monthly statistics, sorted by year and month
+
+        Example:
+            >>> filter_obj = BillFilter(year=2024)
+            >>> stats = repository.get_monthly_stats(filter_obj)
+            >>> for stat in stats:
+            ...     print(f"{stat['year']}-{stat['month']:02d}: €{stat['total_amount']}")
+        """
+        conditions = []
+        params = []
+
+        # Build WHERE clause using same logic as get_total_amount
+        if filter_criteria:
+            # Year filter
+            if filter_criteria.year:
+                start = date(filter_criteria.year, 1, 1)
+                end = date(filter_criteria.year, 12, 31)
+                conditions.append("bill_date >= ? AND bill_date <= ?")
+                params.extend([start, end])
+
+            # Date range filter
+            if filter_criteria.start_date:
+                conditions.append("bill_date >= ?")
+                params.append(filter_criteria.start_date)
+
+            if filter_criteria.end_date:
+                conditions.append("bill_date <= ?")
+                params.append(filter_criteria.end_date)
+
+            # Practitioner type filter
+            if filter_criteria.practitioner_type:
+                conditions.append("practitioner_type = ?")
+                params.append(filter_criteria.practitioner_type)
+
+            # Status filter
+            if filter_criteria.extraction_status:
+                conditions.append("extraction_status = ?")
+                params.append(filter_criteria.extraction_status)
+
+        # Build SQL query - group by year and month using strftime
+        sql = """
+            SELECT
+                CAST(strftime('%Y', bill_date) AS INTEGER) as year,
+                CAST(strftime('%m', bill_date) AS INTEGER) as month,
+                COUNT(*) as bill_count,
+                SUM(total_amount) as total_amount,
+                AVG(total_amount) as average_amount
+            FROM bills
+        """
+        if conditions:
+            sql += " WHERE " + " AND ".join(conditions)
+
+        sql += """
+            GROUP BY year, month
+            ORDER BY year, month
+        """
+
+        with self.db.get_connection() as conn:
+            cursor = conn.execute(sql, tuple(params))
+            rows = cursor.fetchall()
+
+        # Convert to list of dicts with proper types
+        return [
+            {
+                "year": row[0],
+                "month": row[1],
+                "bill_count": row[2],
+                "total_amount": Decimal(str(row[3])),
+                "average_amount": Decimal(str(row[4])),
+            }
+            for row in rows
+        ]
+
     def count(self, filter_criteria: Optional[BillFilter] = None) -> int:
         """
         Count bills matching criteria.

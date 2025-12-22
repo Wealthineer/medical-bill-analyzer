@@ -211,8 +211,117 @@ By not submitting claims, you save €250.00.
 
 ---
 
+### Step 7: View Spending Statistics (Phase 2)
+
+```bash
+# Show all practitioners sorted by spending
+python -m medical_bill_analyzer stats --by practitioner
+
+# Show top 5 practitioners
+python -m medical_bill_analyzer stats --by practitioner --top 5
+
+# Category breakdown (Arzt, Zahnarzt, etc.)
+python -m medical_bill_analyzer stats --by category
+
+# Category breakdown for 2024 only
+python -m medical_bill_analyzer stats --by category --year 2024
+
+# Monthly trends for 2024
+python -m medical_bill_analyzer stats --by month --year 2024
+
+# Filter by practitioner type
+python -m medical_bill_analyzer stats --by practitioner --type Zahnarzt
+```
+
+**What to expect with `--by practitioner`:**
+- Rich table showing:
+  - Practitioner name
+  - Type (Arzt, Zahnarzt, etc.)
+  - Number of visits
+  - Total spending
+  - Average per visit
+  - Last visit date
+- Practitioners sorted by total spending (highest first)
+- Summary: Number of practitioners, total visits, combined total
+
+**Example output:**
+```
+                    Practitioner Statistics
+┏━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Practitioner   ┃ Type     ┃ Visits ┃    Total ┃ Avg/Visit ┃ Last Visit ┃
+┡━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━┩
+│ Dr. Schmidt    │ Zahnarzt │      5 │  €500.00 │   €100.00 │ 2024-11-30 │
+│ Dr. Müller     │ Arzt     │      3 │  €300.00 │   €100.00 │ 2024-09-20 │
+│ Dr. Weber      │ Arzt     │      2 │  €150.00 │    €75.00 │ 2024-08-15 │
+└────────────────┴──────────┴────────┴──────────┴───────────┴────────────┘
+
+Showing 3 practitioner(s)
+Total visits: 10
+Combined total: €950.00
+```
+
+**What to expect with `--by category`:**
+- Rich table showing:
+  - Category/type (Arzt, Zahnarzt, etc.)
+  - Number of bills
+  - Total spending
+  - Average per bill
+  - Percentage of total spending
+  - Visual percentage bar (█ = 5%)
+- Categories with >20% spending marked with ★
+- Summary: Number of categories, total bills, grand total
+
+**Example output:**
+```
+                 Category Statistics - 2024
+┏━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Category   ┃  Bills ┃    Total ┃ Avg/Bill  ┃ % of Total┃          ┃
+┡━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━┩
+│ ★ Zahnarzt │      5 │  €500.00 │   €100.00 │      52.6%│ ██████████│
+│ ★ Arzt     │      5 │  €450.00 │    €90.00 │      47.4%│ █████████ │
+└────────────┴────────┴──────────┴───────────┴───────────┴──────────┘
+
+★ = Major category (>20% of spending)
+
+Showing 2 categories
+Total bills: 10
+Grand total: €950.00
+```
+
+**What to expect with `--by month`:**
+- Rich table showing:
+  - Period (YYYY-MM)
+  - Month name (Jan, Feb, etc.)
+  - Number of bills
+  - Total spending
+  - Average per bill
+- Months sorted chronologically
+- Summary: Number of months, total bills, average per month, total
+
+**Example output:**
+```
+               Monthly Statistics - 2024
+┏━━━━━━━━━┳━━━━━━━┳━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┓
+┃ Period  ┃ Month ┃  Bills ┃    Total ┃ Avg/Bill  ┃
+┡━━━━━━━━━╇━━━━━━━╇━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━┩
+│ 2024-01 │ Jan   │      1 │  €100.00 │   €100.00 │
+│ 2024-02 │ Feb   │      1 │   €90.00 │    €90.00 │
+│ 2024-03 │ Mar   │      1 │  €120.00 │   €120.00 │
+│ 2024-05 │ May   │      1 │  €110.00 │   €110.00 │
+│ 2024-06 │ Jun   │      2 │  €155.00 │    €77.50 │
+└─────────┴───────┴────────┴──────────┴───────────┘
+
+Showing 5 months
+Total bills: 6
+Average per month: €115.00
+Total: €575.00
+```
+
+---
+
 ## Testing Checklist
 
+### Phase 1 - Core Functionality
 - [ ] Setup wizard completes successfully
 - [ ] Can add a single bill
 - [ ] Extracted data looks correct (practitioner, date, amount)
@@ -225,14 +334,30 @@ By not submitting claims, you save €250.00.
 - [ ] All commands show colored output
 - [ ] Help works for all commands
 
+### Phase 2 - Enhanced Analytics
+- [ ] Stats command shows practitioner breakdown
+- [ ] Practitioners sorted by total spending (highest first)
+- [ ] `--top N` flag limits results correctly
+- [ ] Stats command shows category breakdown
+- [ ] Categories show percentage bars
+- [ ] Major categories (>20%) marked with ★
+- [ ] Stats command shows monthly trends
+- [ ] Months sorted chronologically
+- [ ] `--year` filter works for all stat types
+- [ ] `--type` filter works for practitioners and monthly stats
+- [ ] Summary statistics shown for each view
+- [ ] Rich tables display correctly with colors
+
 ---
 
 ## Troubleshooting
 
-### "Configuration error"
+### Phase 1 Issues
+
+#### "Configuration error"
 - Run `python -m medical_bill_analyzer setup` first
 
-### "API key not found" or "Connection failed"
+#### "API key not found" or "Connection failed"
 - The setup wizard should have prompted you to enter your API key
 - Your API key is saved securely in the database (`~/.medical-bill-analyzer/data/medical_bills.db`)
 - If you need to update it, run the setup wizard again:
@@ -241,8 +366,30 @@ By not submitting claims, you save €250.00.
   ```
 - For Ollama: Make sure Ollama is running (`ollama serve`)
 
-### "No bills found"
+#### "No bills found"
 - Make sure you've added bills first with the `add` command
+
+### Phase 2 Issues
+
+#### "No data found" when running stats
+- You need to have added bills first with the `add` command
+- If you're using `--year` filter, make sure you have bills for that year
+- Try running without filters first: `python -m medical_bill_analyzer stats --by practitioner`
+
+#### Stats show "Unknown" for practitioner or category
+- This happens when the LLM extraction didn't identify the practitioner name or type
+- The bill is still counted in statistics, just categorized as "Unknown"
+- You can review bills with `list` command and check extraction status
+
+#### Monthly stats are missing some months
+- Only months with bills are shown
+- If you don't have bills for a month, it won't appear in the output
+- Use `--year 2024` to see all months with data for that year
+
+#### Percentages in category stats don't seem right
+- Percentages are calculated based on all bills in the filtered set
+- If you're using `--year` filter, percentages are relative to that year only
+- Try without filters to see overall percentages
 
 ---
 
@@ -283,6 +430,7 @@ rm -rf ~/.medical-bill-analyzer
 
 ## Success Criteria
 
+### Phase 1 - Core Functionality
 ✅ The application is working correctly if:
 1. Setup completes without errors
 2. Bills are extracted and stored
@@ -290,4 +438,16 @@ rm -rf ~/.medical-bill-analyzer
 4. Total matches your expectations
 5. Bonus recommendation makes sense given your costs
 
-🎉 **If all tests pass, Phase 1 MVP is complete!**
+🎉 **If all Phase 1 tests pass, MVP is complete!**
+
+### Phase 2 - Enhanced Analytics
+✅ Analytics are working correctly if:
+1. Practitioner stats show all doctors sorted by spending
+2. `--top N` correctly limits the number of results
+3. Category breakdown shows percentages that add up to 100%
+4. Visual percentage bars appear for categories
+5. Monthly stats are in chronological order
+6. Year and type filters work as expected
+7. Summary totals match the `total` command output
+
+🎉 **If all Phase 2 tests pass, Enhanced Analytics is complete!**

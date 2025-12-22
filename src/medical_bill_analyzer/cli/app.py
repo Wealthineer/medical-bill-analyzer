@@ -40,6 +40,7 @@ from medical_bill_analyzer.cli import (
     bonus_cmd,
     list_cmd,
     setup_cmd,
+    stats_cmd,
     total_cmd,
 )
 
@@ -48,3 +49,4 @@ app.command(name="add")(add_cmd.add)
 app.command(name="list")(list_cmd.list_bills)
 app.command(name="total")(total_cmd.total)
 app.command(name="bonus-check")(bonus_cmd.bonus_check)
+app.command(name="stats")(stats_cmd.stats)
