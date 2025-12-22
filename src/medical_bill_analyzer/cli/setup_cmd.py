@@ -3,6 +3,7 @@
 import os
 from decimal import Decimal
 from pathlib import Path
+from typing import Optional
 
 import typer
 
@@ -199,17 +200,15 @@ def _test_llm_connection(provider_name: str, api_key: Optional[str]) -> bool:
         try:
             provider = create_llm_provider(provider_name, config)
             result = provider.test_connection()
+            progress.update(1)
+            typer.echo()
 
-            if result["success"]:
-                progress.update(1)
-                typer.echo()
-                success_message(f"Connected successfully: {result['message']}")
+            if result:
+                success_message(f"Connected successfully")
                 typer.echo()
                 return True
             else:
-                progress.update(1)
-                typer.echo()
-                error_message(f"Connection failed: {result['message']}")
+                error_message(f"Connection test failed")
                 typer.echo()
                 return False
 
@@ -263,10 +262,9 @@ def _initialize_database() -> Path:
 
     with typer.progressbar(length=1, label="Creating database") as progress:
         try:
-            # Create connection and run migrations (including v2 for credentials)
-            db = DatabaseConnection(db_path)
-            manager = MigrationManager(db)
-            manager.run_migrations()
+            # Run migrations (including v2 for credentials)
+            manager = MigrationManager(db_path)
+            manager.migrate()
 
             progress.update(1)
             typer.echo()
