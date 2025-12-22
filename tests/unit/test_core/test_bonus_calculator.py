@@ -87,25 +87,30 @@ class TestCalculateTotal:
 
     def test_calculate_total_by_year(self, calculator, mock_repository):
         """Test calculating total for a year."""
-        mock_repository.get_total_amount_by_year.return_value = Decimal("1234.56")
+        mock_repository.get_total_amount.return_value = Decimal("1234.56")
 
         total = calculator.calculate_total(year=2024)
 
         assert total == Decimal("1234.56")
-        mock_repository.get_total_amount_by_year.assert_called_once_with(2024)
+        # Should call with BillFilter(year=2024)
+        call_args = mock_repository.get_total_amount.call_args[0][0]
+        assert isinstance(call_args, BillFilter)
+        assert call_args.year == 2024
 
     def test_calculate_total_by_date_range(self, calculator, mock_repository):
         """Test calculating total for date range."""
         from_date = date(2024, 1, 1)
         to_date = date(2024, 12, 31)
-        mock_repository.get_total_amount_by_date_range.return_value = Decimal("555.55")
+        mock_repository.get_total_amount.return_value = Decimal("555.55")
 
         total = calculator.calculate_total(from_date=from_date, to_date=to_date)
 
         assert total == Decimal("555.55")
-        mock_repository.get_total_amount_by_date_range.assert_called_once_with(
-            from_date, to_date
-        )
+        # Should call with BillFilter(start_date=from_date, end_date=to_date)
+        call_args = mock_repository.get_total_amount.call_args[0][0]
+        assert isinstance(call_args, BillFilter)
+        assert call_args.start_date == from_date
+        assert call_args.end_date == to_date
 
     def test_calculate_total_with_filter(self, calculator, mock_repository):
         """Test calculating total with custom filter."""
@@ -259,7 +264,7 @@ class TestGetRecommendationForYear:
 
     def test_get_recommendation_for_year(self, calculator, mock_repository):
         """Test getting recommendation for a year."""
-        mock_repository.get_total_amount_by_year.return_value = Decimal("750")
+        mock_repository.get_total_amount.return_value = Decimal("750")
 
         rec = calculator.get_recommendation_for_year(2024, Decimal("1000"))
 
@@ -267,16 +272,21 @@ class TestGetRecommendationForYear:
         assert rec.total_amount == Decimal("750")
         assert rec.bonus_threshold == Decimal("1000")
         assert rec.savings == Decimal("250")
-        mock_repository.get_total_amount_by_year.assert_called_once_with(2024)
+        # Should call with BillFilter(year=2024)
+        call_args = mock_repository.get_total_amount.call_args[0][0]
+        assert isinstance(call_args, BillFilter)
+        assert call_args.year == 2024
 
     def test_get_recommendation_combines_methods(self, calculator, mock_repository):
         """Test that get_recommendation_for_year combines calculate_total and compare_to_threshold."""
-        mock_repository.get_total_amount_by_year.return_value = Decimal("1500")
+        mock_repository.get_total_amount.return_value = Decimal("1500")
 
         rec = calculator.get_recommendation_for_year(2024, Decimal("1000"))
 
-        # Should calculate total for year
-        mock_repository.get_total_amount_by_year.assert_called_once_with(2024)
+        # Should calculate total for year with BillFilter
+        call_args = mock_repository.get_total_amount.call_args[0][0]
+        assert isinstance(call_args, BillFilter)
+        assert call_args.year == 2024
         # Should return recommendation based on comparison
         assert rec.recommendation == "submit_claims"
         assert rec.total_amount == Decimal("1500")

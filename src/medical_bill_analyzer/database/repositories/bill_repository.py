@@ -371,17 +371,19 @@ class BillRepository(BaseRepository[Bill]):
 
     def get_total_amount(
         self,
+        filter_criteria: Optional[BillFilter] = None,
         year: Optional[int] = None,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
     ) -> Decimal:
         """
-        Calculate total amount of bills.
+        Calculate total amount of bills with optional filtering.
 
         Args:
-            year: Optional year filter
-            start_date: Optional start date
-            end_date: Optional end date
+            filter_criteria: Optional BillFilter object to filter bills
+            year: Optional year filter (for backward compatibility)
+            start_date: Optional start date (for backward compatibility)
+            end_date: Optional end date (for backward compatibility)
 
         Returns:
             Total amount as Decimal
@@ -389,19 +391,51 @@ class BillRepository(BaseRepository[Bill]):
         conditions = []
         params = []
 
-        if year:
-            start = date(year, 1, 1)
-            end = date(year, 12, 31)
-            conditions.append("bill_date >= ? AND bill_date <= ?")
-            params.extend([start, end])
+        # Handle backward compatibility: convert old-style params to BillFilter
+        if year or start_date or end_date:
+            if filter_criteria:
+                raise ValueError("Cannot use both filter_criteria and year/start_date/end_date")
+            filter_criteria = BillFilter(year=year, start_date=start_date, end_date=end_date)
 
-        if start_date:
-            conditions.append("bill_date >= ?")
-            params.append(start_date)
+        if filter_criteria:
+            # Year filter
+            if filter_criteria.year:
+                start = date(filter_criteria.year, 1, 1)
+                end = date(filter_criteria.year, 12, 31)
+                conditions.append("bill_date >= ? AND bill_date <= ?")
+                params.extend([start, end])
 
-        if end_date:
-            conditions.append("bill_date <= ?")
-            params.append(end_date)
+            # Date range filter
+            if filter_criteria.start_date:
+                conditions.append("bill_date >= ?")
+                params.append(filter_criteria.start_date)
+
+            if filter_criteria.end_date:
+                conditions.append("bill_date <= ?")
+                params.append(filter_criteria.end_date)
+
+            # Practitioner filters
+            if filter_criteria.practitioner_name:
+                conditions.append("practitioner_name LIKE ?")
+                params.append(f"%{filter_criteria.practitioner_name}%")
+
+            if filter_criteria.practitioner_type:
+                conditions.append("practitioner_type = ?")
+                params.append(filter_criteria.practitioner_type)
+
+            # Status filter
+            if filter_criteria.extraction_status:
+                conditions.append("extraction_status = ?")
+                params.append(filter_criteria.extraction_status)
+
+            # Amount filters
+            if filter_criteria.min_amount is not None:
+                conditions.append("total_amount >= ?")
+                params.append(filter_criteria.min_amount)
+
+            if filter_criteria.max_amount is not None:
+                conditions.append("total_amount <= ?")
+                params.append(filter_criteria.max_amount)
 
         sql = "SELECT COALESCE(SUM(total_amount), 0) FROM bills"
         if conditions:

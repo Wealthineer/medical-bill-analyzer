@@ -133,10 +133,12 @@ class BonusCalculator:
             total = self.repository.get_total_amount(filter_obj)
         elif year:
             # Filter by year
-            total = self.repository.get_total_amount_by_year(year)
+            total = self.repository.get_total_amount(BillFilter(year=year))
         elif from_date and to_date:
             # Filter by date range
-            total = self.repository.get_total_amount_by_date_range(from_date, to_date)
+            total = self.repository.get_total_amount(
+                BillFilter(start_date=from_date, end_date=to_date)
+            )
         else:
             # No filter - get all bills
             total = self.repository.get_total_amount(BillFilter())
