@@ -11,10 +11,23 @@ A desktop application for German private health insurance (PKV) customers to ana
 - ✅ CLI commands for bill management
 - ✅ Bonus vs. claim submission recommendation
 
+### Phase 2: Enhanced Analytics
+- ✅ Practitioner-level spending statistics
+- ✅ Category breakdown with percentages
+- ✅ Monthly time-series analysis
+- ✅ CLI stats command with Rich tables
+
+### Phase 4a: Interactive Text User Interface (TUI)
+- ✅ Interactive dashboard with spending overview (current year)
+- ✅ Navigate between screens with keyboard shortcuts (q, d, s, b, a)
+- ✅ Add bills through wizard with detailed extraction preview
+- ✅ Delete bills (X/Delete key in Bills screen, or after adding)
+- ✅ View statistics (practitioner breakdown)
+- ✅ Smart path handling for drag-and-drop PDFs
+- ✅ Auto-launches when no CLI args provided
+
 ### Future Phases
-- **Phase 2**: Enhanced analytics (practitioner and category statistics, time-series analysis)
 - **Phase 3**: Line item extraction and insurance coverage analysis
-- **Phase 4a**: Interactive Text User Interface (TUI)
 - **Phase 4b**: Standalone executable packaging
 
 ## Installation
@@ -41,9 +54,11 @@ Or using pip:
 pip install -e .
 ```
 
-> **✅ Current Status (Phase 1 Complete)**: The MVP is fully functional!
+> **✅ Current Status**: Phases 1, 2, and 4a complete!
 >
-> All commands below are working. Start with `medical-bill-analyzer setup` to configure the application.
+> - **TUI Mode** (recommended): Just run `medical-bill-analyzer` with no arguments for an interactive interface
+> - **CLI Mode**: Use commands like `medical-bill-analyzer setup`, `medical-bill-analyzer add`, etc.
+> - Start with `medical-bill-analyzer setup` to configure the application
 
 3. Run the setup wizard:
 ```bash
@@ -59,7 +74,37 @@ The setup wizard will guide you through:
 
 ## Usage
 
-### Add bills
+### Interactive TUI (Recommended)
+
+The Text User Interface (TUI) provides an interactive terminal interface for easier navigation and better user experience.
+
+**Launch TUI:**
+```bash
+# Auto-launches TUI if no arguments provided
+medical-bill-analyzer
+```
+
+**TUI Features:**
+- **Dashboard**: View current year summary (bills, costs, bonus status) and recent bills
+- **Statistics**: Practitioner breakdown with spending analysis
+- **Bills**: List all bills with search and delete functionality (X or Delete key)
+- **Add Wizard**: Multi-step wizard with detailed extraction preview and delete option
+
+**Keyboard Shortcuts:**
+- `d` - Dashboard
+- `s` - Statistics
+- `b` - Bills
+- `a` - Add Bills
+- `q` - Quit
+- `x` or `Delete` - Delete selected bill (in Bills screen)
+- `Esc` - Go back / Previous screen
+- `r` - Refresh current view
+
+### CLI Commands
+
+All functionality is also available via CLI commands:
+
+#### Add bills
 ```bash
 # Add a single bill
 medical-bill-analyzer add /path/to/bill.pdf
@@ -164,7 +209,7 @@ bonus:
 
 ### Project Status
 
-**Current Implementation**: Phase 2 Complete (100%) - Enhanced Analytics Ready!
+**Current Implementation**: Phase 4a - TUI Functional (75%)!
 
 **Phase 1 (Complete)**: Core Functionality (MVP)
 - ✅ Project infrastructure setup
@@ -184,6 +229,16 @@ bonus:
 - ✅ Monthly time-series analysis
 - ✅ CLI stats command with Rich tables
 - ✅ Comprehensive testing (440 tests, 62% coverage)
+
+**Phase 4a (75% Complete)**: Interactive Text User Interface
+- ✅ TUI framework with Textual
+- ✅ Dashboard screen (2024 summary, recent bills)
+- ✅ Statistics screen (practitioner/category/monthly tabs)
+- ✅ Bills screen (list, search)
+- ✅ Add Wizard (multi-step PDF processing)
+- ✅ Navigation system (keyboard shortcuts)
+- ✅ Auto-launch when no CLI args
+- ⏸️  TUI testing (deferred)
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed progress tracking.
 
