@@ -215,25 +215,28 @@ This file tracks the overall implementation progress. Each phase has a detailed 
   - Textual dependency added to pyproject.toml
 - **TUI Screens** (4 screens, ~1000 lines of code):
   - `dashboard.py`: Current year summary (bills, costs, bonus status) + recent bills table
-  - `stats.py`: Practitioner statistics with refresh (simplified - tabs removed due to Textual API issues)
-  - `bills.py`: List all bills with search, delete functionality (X or Delete key)
+  - `stats.py`: Practitioner statistics with year navigation (Previous/Next Year buttons)
+  - `bills.py`: List all bills with search, delete functionality (X key)
   - `add_wizard.py`: Multi-step wizard with detailed extraction preview and delete option
 - **Zero Business Logic Duplication**:
   - Calls same core modules as CLI: BillProcessor, BonusCalculator, AnalyticsEngine
   - Uses same repositories: BillRepository, CredentialRepository
   - Uses same utilities: load_config, get_database_path, format_currency
 - **Enhanced Features**:
-  - **Delete Functionality**: Remove bills from Bills screen (X/Delete) or Add Wizard (Step 3)
+  - **Delete Functionality**: Remove bills from Bills screen (X key) or Add Wizard (Step 3)
+  - **Year Navigation**: Statistics screen has Previous/Next Year buttons to browse different years
   - **Detailed Extraction Preview**: Shows practitioner, type, date, amount, bill number for each added bill
   - **Smart Path Handling**: Strips quotes, handles escaped spaces, resolves paths correctly for drag-and-drop
   - **Dynamic Year Display**: Dashboard shows current year (2025) instead of hardcoded 2024
   - **Contextual Help**: Screen-specific help text guides user through each workflow
+  - **Consistent Keyboard Shortcuts**: All shortcuts use single letters (d, s, b, a, q, r, x)
 - **Bug Fixes**:
   - Fixed `add_wizard.py` file path (moved from wrong directory with hyphen to correct with underscore)
   - Fixed `stats.py` TabbedContent API incompatibility (simplified to single view)
   - Fixed `dashboard.py` BonusCalculator method names (`get_total_amount()` → `calculate_total()`, `get_bonus_recommendation()` → `get_recommendation_for_year()`)
   - Fixed keyboard binding conflict: Bills screen uses `X` instead of `D` to avoid Dashboard navigation conflict
   - Fixed path handling: Remove quotes from drag-and-drop, handle backslash-escaped spaces, better error messages
+  - Fixed help text display: Removed brackets (were hidden by Textual markup system)
 - **Regression Tests**: ✅ All 440 Phase 1-2 tests still passing (no regressions)
 - **Skipped**: Coverage Analysis Screen (depends on Phase 3 which is deferred)
 - **Deferred**: TUI testing (can be added later)
