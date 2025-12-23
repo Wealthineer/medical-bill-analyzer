@@ -128,6 +128,17 @@ medical-bill-analyzer list --year 2024
 medical-bill-analyzer list --status needs_review
 ```
 
+### Delete bills
+```bash
+# Delete a bill by ID (with confirmation)
+medical-bill-analyzer delete 5
+
+# Delete a bill without confirmation
+medical-bill-analyzer delete 10 --force
+```
+
+**Note**: Use `medical-bill-analyzer list` to see all bills and their IDs.
+
 ### Calculate totals
 ```bash
 # Show total for current year

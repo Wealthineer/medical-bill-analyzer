@@ -223,7 +223,7 @@ This file tracks the overall implementation progress. Each phase has a detailed 
   - Uses same repositories: BillRepository, CredentialRepository
   - Uses same utilities: load_config, get_database_path, format_currency
 - **Enhanced Features**:
-  - **Delete Functionality**: Remove bills from Bills screen (X key) or Add Wizard (Step 3)
+  - **Delete Functionality**: Remove bills from Bills screen (X key), Add Wizard (Step 3), or CLI (`delete` command)
   - **Year Navigation**: Statistics screen has Previous/Next Year buttons to browse different years
   - **Detailed Extraction Preview**: Shows practitioner, type, date, amount, bill number for each added bill
   - **Smart Path Handling**: Strips quotes, handles escaped spaces, resolves paths correctly for drag-and-drop
@@ -327,6 +327,11 @@ This file tracks the overall implementation progress. Each phase has a detailed 
     - Filter by: year, date range, practitioner name/type, status
     - Limit results
     - Shows total amount
+  - `delete`: Delete bills from database (95 lines)
+    - Delete by bill ID
+    - Shows bill details before deletion
+    - Confirmation prompt (can skip with --force)
+    - Clear success/error messages
   - `total`: Calculate costs (110 lines)
     - Filter by: year, date range, practitioner type
     - Clear formatted output with context

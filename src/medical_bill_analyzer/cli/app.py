@@ -38,6 +38,7 @@ def main(
 from medical_bill_analyzer.cli import (
     add_cmd,
     bonus_cmd,
+    delete_cmd,
     list_cmd,
     setup_cmd,
     stats_cmd,
@@ -47,6 +48,7 @@ from medical_bill_analyzer.cli import (
 app.command(name="setup")(setup_cmd.setup)
 app.command(name="add")(add_cmd.add)
 app.command(name="list")(list_cmd.list_bills)
+app.command(name="delete")(delete_cmd.delete)
 app.command(name="total")(total_cmd.total)
 app.command(name="bonus-check")(bonus_cmd.bonus_check)
 app.command(name="stats")(stats_cmd.stats)
