@@ -59,7 +59,6 @@ class BillsScreen(Screen):
 
     BINDINGS = [
         ("r", "refresh", "Refresh"),
-        ("delete", "delete_selected", "Delete"),
         ("x", "delete_selected", "Delete"),
     ]
 
@@ -77,7 +76,7 @@ class BillsScreen(Screen):
             DataTable(id="bills-table"),
             Static(id="summary"),
             Static(
-                "Use ↑↓ to select | [X] or [Del] to delete | [R]efresh | [Esc] to go back",
+                "Use ↑↓ to select | X to delete | R to refresh | Esc to go back",
                 id="help-text",
             ),
             id="bills-container",

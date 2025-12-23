@@ -46,6 +46,14 @@ class StatsScreen(Screen):
     #filter-bar {
         height: auto;
         padding: 1 0;
+        align: center middle;
+    }
+
+    #year-label {
+        text-align: center;
+        text-style: bold;
+        color: $accent;
+        width: 15;
     }
 
     DataTable {
@@ -60,9 +68,7 @@ class StatsScreen(Screen):
     }
     """
 
-    BINDINGS = [
-        ("r", "refresh", "Refresh"),
-    ]
+    BINDINGS = []
 
     def __init__(self):
         """Initialize stats screen."""
@@ -74,8 +80,9 @@ class StatsScreen(Screen):
         yield Header()
         yield Container(
             Horizontal(
-                Label(f"Viewing data for: {self.current_year}"),
-                Button("Refresh", id="refresh-btn", variant="primary"),
+                Button("◀ Previous Year", id="prev-year-btn", variant="default"),
+                Label(f"{self.current_year}", id="year-label"),
+                Button("Next Year ▶", id="next-year-btn", variant="default"),
                 id="filter-bar",
             ),
             Static("Practitioner Statistics", classes="title"),
@@ -91,12 +98,24 @@ class StatsScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button clicks."""
-        if event.button.id == "refresh-btn":
-            self.action_refresh()
+        if event.button.id == "prev-year-btn":
+            self._change_year(-1)
+        elif event.button.id == "next-year-btn":
+            self._change_year(1)
 
-    def action_refresh(self) -> None:
-        """Refresh all statistics data."""
-        self.app.notify("Refreshing statistics...", timeout=2)
+    def _change_year(self, delta: int) -> None:
+        """Change the displayed year.
+
+        Args:
+            delta: Year change delta (-1 for previous, +1 for next)
+        """
+        self.current_year += delta
+
+        # Update year label
+        year_label = self.query_one("#year-label", Label)
+        year_label.update(f"{self.current_year}")
+
+        # Reload data for new year
         self._load_all_tabs()
 
     def _load_all_tabs(self) -> None:

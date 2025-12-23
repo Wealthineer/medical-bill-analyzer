@@ -21,8 +21,8 @@ A desktop application for German private health insurance (PKV) customers to ana
 - ✅ Interactive dashboard with spending overview (current year)
 - ✅ Navigate between screens with keyboard shortcuts (q, d, s, b, a)
 - ✅ Add bills through wizard with detailed extraction preview
-- ✅ Delete bills (X/Delete key in Bills screen, or after adding)
-- ✅ View statistics (practitioner breakdown)
+- ✅ Delete bills (X key in Bills screen, or after adding)
+- ✅ View statistics with year navigation (practitioner breakdown)
 - ✅ Smart path handling for drag-and-drop PDFs
 - ✅ Auto-launches when no CLI args provided
 
@@ -86,8 +86,8 @@ medical-bill-analyzer
 
 **TUI Features:**
 - **Dashboard**: View current year summary (bills, costs, bonus status) and recent bills
-- **Statistics**: Practitioner breakdown with spending analysis
-- **Bills**: List all bills with search and delete functionality (X or Delete key)
+- **Statistics**: Practitioner breakdown with year navigation (Previous/Next year buttons)
+- **Bills**: List all bills with search and delete functionality (X key)
 - **Add Wizard**: Multi-step wizard with detailed extraction preview and delete option
 
 **Keyboard Shortcuts:**
@@ -96,9 +96,9 @@ medical-bill-analyzer
 - `b` - Bills
 - `a` - Add Bills
 - `q` - Quit
-- `x` or `Delete` - Delete selected bill (in Bills screen)
+- `x` - Delete selected bill (in Bills screen)
 - `Esc` - Go back / Previous screen
-- `r` - Refresh current view
+- `r` - Refresh current view (Dashboard, Bills)
 
 ### CLI Commands
 

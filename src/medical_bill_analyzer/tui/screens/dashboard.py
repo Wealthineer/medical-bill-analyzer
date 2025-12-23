@@ -95,7 +95,7 @@ class DashboardScreen(Screen):
             id="recent-container",
         )
         yield Static(
-            "Press [S] Stats | [B] Bills | [A] Add | [Q] Quit",
+            "Press S for Stats | B for Bills | A to Add | Q to Quit",
             id="help-text",
         )
         yield Footer()
