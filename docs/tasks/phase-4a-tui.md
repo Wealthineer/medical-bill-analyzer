@@ -1,7 +1,7 @@
 # Phase 4a: Text User Interface - Detailed Tasks
 
-**Status**: ✅ Complete (75% of original scope - Coverage screen skipped)
-**Completed**: December 23, 2025
+**Status**: ✅ Complete (85% of original scope - Coverage screen skipped)
+**Completed**: December 25, 2025
 **Dependencies**: Phase 1, 2 complete (Phase 3 deferred)
 
 ---
@@ -38,6 +38,7 @@ Phase 4a created an interactive terminal UI using Textual framework. The TUI wra
 - [x] `s` - Statistics
 - [x] `b` - Bills
 - [x] `a` - Add bills
+- [x] `c` - Settings
 - [x] `x` - Delete (Bills screen)
 - [x] `r` - Refresh (Bills screen)
 - [x] `Esc` - Go back
@@ -229,7 +230,7 @@ Will be implemented when Phase 3 is completed.
 - [x] Handle conflicts (X for delete, not D which is Dashboard)
 
 ### Shortcuts Summary:
-- **Global**: d (dashboard), s (stats), b (bills), a (add), q (quit), Esc (back)
+- **Global**: d (dashboard), s (stats), b (bills), a (add), c (settings), q (quit), Esc (back)
 - **Bills screen**: x (delete), r (refresh), ↑↓ (select)
 - **Stats screen**: Previous/Next Year buttons
 - **All single letters** for consistency
@@ -242,7 +243,74 @@ Will be implemented when Phase 3 is completed.
 
 ---
 
-## 4a.9 Custom Widgets
+## 4a.9 Settings Screen
+
+**Status**: ✅ Complete
+**Completed**: December 25, 2025
+
+### Files Created:
+- [x] `src/medical_bill_analyzer/tui/screens/settings.py` (~400 lines)
+
+### Files Updated:
+- [x] `src/medical_bill_analyzer/tui/screens/__init__.py`
+- [x] `src/medical_bill_analyzer/tui/app.py`
+
+### Tasks Completed:
+- [x] Provider selection dropdown (Anthropic, OpenAI, LM Studio, Ollama)
+- [x] Dynamic form updates based on provider
+- [x] API key input (password-masked)
+- [x] Model name configuration
+- [x] Base URL support for LM Studio and Ollama
+- [x] Bonus threshold configuration
+- [x] Test connection functionality
+- [x] Save to both config.yaml and database
+- [x] Load current settings on mount
+- [x] Keyboard binding 'c' for Settings
+
+### Features Implemented:
+- **Provider Selection**: Select widget with 4 options
+  - Anthropic Claude (cloud)
+  - OpenAI GPT (cloud)
+  - LM Studio (local - OpenAI-compatible)
+  - Ollama (local)
+- **Dynamic Form**: Form fields change based on provider
+  - Anthropic: API key, model name
+  - OpenAI: API key, model name
+  - LM Studio: Base URL (user pastes from LM Studio UI), model name (no API key shown)
+  - Ollama: Base URL, model name (no API key)
+- **Settings Management**:
+  - Save ALL settings to SQLite database (provider, model, base_url, bonus threshold)
+  - Save credentials to SQLite database (API keys)
+  - Load current settings from database
+  - No more YAML configuration files
+- **Test Connection**: Verify provider connectivity before saving
+- **User Experience**:
+  - Clear section titles and labels
+  - Help text: "Just paste the URL shown in LM Studio"
+  - Auto-append /v1 to LM Studio URLs for OpenAI API compatibility
+  - Bonus threshold displays as integer (e.g., "2000" not "2000.0")
+  - Status messages for save/test operations
+  - Notifications for success/error states
+- **Database Integration**:
+  - Uses SettingsRepository for database operations
+  - Single source of truth for all configuration
+  - Compatible with Phase 4b bundled executable
+
+### Testing:
+- [x] Settings screen loads
+- [x] Provider selection works
+- [x] Form updates dynamically (show/hide API key vs Base URL)
+- [x] Test connection works
+- [x] Save to database works
+- [x] Save credentials works
+- [x] Keyboard binding works ('c' key)
+- [x] LM Studio URL auto-appends /v1
+- [x] Bonus threshold displays without decimal for whole numbers
+- [x] Load current settings from database on mount
+
+---
+
+## 4a.10 Custom Widgets
 
 **Status**: ⏸️ Deferred (not needed)
 
@@ -251,12 +319,13 @@ Used built-in Textual widgets instead:
 - Static for text content
 - Button for actions
 - Input for search/file selection
+- Select for dropdowns (Settings screen)
 
 No custom widgets needed for current functionality.
 
 ---
 
-## 4a.10 CLI Integration
+## 4a.11 CLI Integration
 
 **Status**: ✅ Complete
 
@@ -301,7 +370,7 @@ except KeyboardInterrupt:
 
 ---
 
-## 4a.11 TUI Testing
+## 4a.12 TUI Testing
 
 **Status**: ⏸️ Deferred
 
@@ -319,7 +388,8 @@ TUI testing deferred to allow faster delivery of functional TUI. Can be added la
 
 - [x] ✅ TUI launches successfully and displays dashboard
 - [x] ✅ Can add bills through TUI wizard with detailed preview
-- [x] ✅ Can navigate all major screens with keyboard (d, s, b, a, q, x, r, Esc)
+- [x] ✅ Can configure settings through TUI (LLM providers, API keys)
+- [x] ✅ Can navigate all major screens with keyboard (d, s, b, a, c, q, x, r, Esc)
 - [x] ✅ TUI gracefully degrades if terminal doesn't support it (falls back to CLI)
 - [x] ✅ All CLI functionality accessible through TUI
 - [x] ✅ **Phase 1-2 functionality unchanged** (440 regression tests passing)

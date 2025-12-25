@@ -83,11 +83,13 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 - [x] 4a.6 Add bills wizard
 - [ ] 4a.7 Coverage analysis screen (skipped - depends on Phase 3)
 - [x] 4a.8 Keyboard shortcuts
-- [ ] 4a.9 TUI testing (deferred)
+- [x] 4a.9 Settings screen
+- [ ] 4a.10 TUI testing (deferred)
 
 **Acceptance Criteria:**
 - [x] TUI launches and displays dashboard
 - [x] Can add bills through wizard
+- [x] Can configure settings through TUI
 - [x] Can navigate all screens with keyboard
 - [x] Graceful degradation on unsupported terminals
 - [x] All CLI functionality accessible via TUI (440 tests passing)
@@ -135,18 +137,19 @@ This file tracks the overall implementation progress. Each phase has a detailed 
   - ✅ CLI stats command with Rich tables
   - ✅ Unit tests (41 tests) and integration tests (14 tests)
 - **Phase 3**: 0% complete (deferred)
-- **Phase 4a**: 🚧 75% complete (6/8 tasks)
+- **Phase 4a**: 🚧 85% complete (7/9 tasks)
   - ✅ TUI framework setup (Textual integration, main app, entry point)
   - ✅ Dashboard screen (2024 summary, recent bills)
   - ✅ Statistics screen (practitioner/category/monthly tabs)
-  - ✅ Bills screen (list all bills, search functionality)
+  - ✅ Bills screen (list all bills, search functionality, delete)
   - ✅ Add Wizard screen (multi-step PDF processing)
-  - ✅ Navigation system (keyboard shortcuts)
+  - ✅ Settings screen (LLM provider config, API keys, test connection)
+  - ✅ Navigation system (keyboard shortcuts: d, s, b, a, c, q, r, x, Esc)
   - ⏭️  Coverage Analysis Screen (skipped - depends on Phase 3)
   - ⏸️  TUI testing (deferred)
 - **Phase 4b**: 0% complete (credential storage foundation complete)
 
-**Overall**: 46% complete (23/50 tasks)
+**Overall**: 48% complete (24/50 tasks)
 
 **🎉 Phase 1 MVP is complete and fully functional!**
 **🎉 Phase 2 Enhanced Analytics is complete!**
@@ -205,6 +208,36 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 ---
 
 ## Recent Updates
+
+### 2025-12-25 - Major Refactor: Settings to Database + Settings Screen ✅
+- **Phase 4a is now 85% complete (7/9 tasks) - Settings screen + database refactor!**
+- **Major architectural change**: Moved ALL settings from YAML to database for Phase 4b compatibility
+- **Settings Screen** (~460 lines of code):
+  - `tui/screens/settings.py`: Complete settings management UI
+  - **Provider Selection**: Anthropic, OpenAI, LM Studio, Ollama
+  - **Dynamic Form**: Shows API key for cloud, Base URL for local providers
+  - **LM Studio UX**: Users paste URL directly (e.g., `http://127.0.0.1:1234`), app auto-appends `/v1`
+  - **Test Connection**: Verify provider before saving
+  - **Save to Database**: All settings persisted to SQLite
+  - **Keyboard Binding**: Press 'c' to open Settings from any screen
+- **Database Refactor (v3 migration)**:
+  - Created `settings` table (single-row configuration storage)
+  - Created `SettingsRepository` with get/save methods
+  - Removed YAML configuration entirely (Settings.from_yaml/to_yaml deleted)
+  - Updated `get_settings()` and `save_settings()` to use database
+  - Updated setup wizard to save to database instead of YAML
+  - All settings and credentials now in same database
+- **Files Changed**: 9 modified, 3 new (migration, repository, settings screen)
+- **Breaking Change**: config.yaml no longer used - all settings in database
+- **Bug Fixes**:
+  - Fixed CSS error: `font-size` → removed (not supported in Textual)
+  - Fixed DatabaseConnection context manager usage in SettingsRepository
+  - Fixed bonus threshold display: Shows "2000" not "2000.0" for whole numbers
+- **Benefits**:
+  - Single source of truth for all configuration
+  - No Path serialization issues with YAML
+  - Ready for Phase 4b bundled executable
+  - Better consistency between settings and credentials storage
 
 ### 2025-12-23 - Phase 4a: Text User Interface (TUI) - Complete! ✅
 - **Phase 4a is now 75% complete (6/8 tasks) - TUI is fully functional!**

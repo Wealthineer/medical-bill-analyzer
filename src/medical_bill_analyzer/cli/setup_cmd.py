@@ -310,7 +310,7 @@ def _save_credential(db_path: Path, provider_name: str, api_key: Optional[str]):
 
 
 def _save_configuration(provider_name: str, bonus_threshold: Decimal):
-    """Save configuration to file.
+    """Save configuration to database.
 
     Args:
         provider_name: Provider name
@@ -319,8 +319,7 @@ def _save_configuration(provider_name: str, bonus_threshold: Decimal):
     typer.secho("Step 7: Saving Configuration", fg=typer.colors.CYAN, bold=True)
     typer.echo()
 
-    config_path = get_config_path()
-    config_path.parent.mkdir(parents=True, exist_ok=True)
+    db_path = get_config_path()
 
     # Build full config from defaults
     full_config = {
@@ -332,13 +331,17 @@ def _save_configuration(provider_name: str, bonus_threshold: Decimal):
         "bonus": {
             "default_threshold": float(bonus_threshold),
         },
+        "extraction": DEFAULT_CONFIG["extraction"],
     }
 
-    # Save to file
+    # Save to database
     with typer.progressbar(length=1, label="Saving configuration") as progress:
+        from medical_bill_analyzer.database import SettingsRepository
+
         settings = Settings(**full_config)
-        settings.to_yaml(config_path)
+        settings_repo = SettingsRepository(db_path)
+        settings_repo.save_settings(settings)
         progress.update(1)
         typer.echo()
-        success_message(f"Configuration saved: {config_path}")
+        success_message(f"Configuration saved to database")
         typer.echo()

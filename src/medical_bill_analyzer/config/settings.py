@@ -4,8 +4,6 @@ from pathlib import Path
 from typing import Literal, Optional
 from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import yaml
-import os
 
 from .defaults import (
     get_user_config_dir,
@@ -32,11 +30,15 @@ class AnthropicConfig(BaseModel):
 
 
 class OpenAIConfig(BaseModel):
-    """OpenAI GPT configuration."""
+    """OpenAI GPT configuration.
+
+    Can be used with OpenAI API or compatible endpoints like LM Studio.
+    """
 
     model: str = DEFAULT_OPENAI_MODEL
     max_tokens: int = DEFAULT_MAX_TOKENS
     temperature: float = DEFAULT_TEMPERATURE
+    base_url: str | None = None  # Optional: For LM Studio or other OpenAI-compatible endpoints
 
 
 class OllamaConfig(BaseModel):
@@ -139,58 +141,57 @@ class Settings(BaseSettings):
         extra="ignore",  # Ignore extra environment variables
     )
 
-    @classmethod
-    def from_yaml(cls, yaml_path: Path) -> "Settings":
-        """Load settings from YAML file."""
-        if not yaml_path.exists():
-            # Return default settings if file doesn't exist
-            return cls()
-
-        with open(yaml_path, "r") as f:
-            data = yaml.safe_load(f) or {}
-
-        return cls(**data)
-
-    def to_yaml(self, yaml_path: Path) -> None:
-        """Save settings to YAML file."""
-        yaml_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Convert to dict, handling Path objects
-        data = self.model_dump(mode="python")
-
-        # Convert Path objects to strings for YAML serialization
-        def convert_paths(obj):
-            if isinstance(obj, dict):
-                return {k: convert_paths(v) for k, v in obj.items()}
-            elif isinstance(obj, list):
-                return [convert_paths(v) for v in obj]
-            elif isinstance(obj, Path):
-                return str(obj)
-            return obj
-
-        data = convert_paths(data)
-
-        with open(yaml_path, "w") as f:
-            yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
 
 def get_config_path() -> Path:
-    """Get the path to the configuration file."""
-    return get_user_config_dir() / "config.yaml"
+    """Get the path to the database file.
+
+    Note: This now returns the database path, not a config.yaml path.
+    """
+    return get_user_data_dir() / "medical_bills.db"
 
 
 def is_first_run() -> bool:
-    """Check if this is the first run (no config file exists)."""
-    return not get_config_path().exists()
+    """Check if this is the first run (no settings in database)."""
+    from ..database import SettingsRepository
+
+    db_path = get_config_path()
+    if not db_path.exists():
+        return True
+
+    try:
+        repo = SettingsRepository(db_path)
+        repo.get_settings()
+        return False
+    except ValueError:
+        # Settings not found in database
+        return True
 
 
 def get_settings() -> Settings:
-    """Get application settings, loading from config file if it exists."""
-    config_path = get_config_path()
-    return Settings.from_yaml(config_path)
+    """Get application settings from database.
+
+    Returns:
+        Settings object
+
+    Raises:
+        ValueError: If settings not found in database
+    """
+    from ..database import SettingsRepository
+
+    db_path = get_config_path()
+    repo = SettingsRepository(db_path)
+    return repo.get_settings()
 
 
 def save_settings(settings: Settings) -> None:
-    """Save settings to config file."""
-    config_path = get_config_path()
-    settings.to_yaml(config_path)
+    """Save settings to database.
+
+    Args:
+        settings: Settings object to save
+    """
+    from ..database import SettingsRepository
+
+    db_path = get_config_path()
+    repo = SettingsRepository(db_path)
+    repo.save_settings(settings)

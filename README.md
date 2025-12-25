@@ -89,12 +89,14 @@ medical-bill-analyzer
 - **Statistics**: Practitioner breakdown with year navigation (Previous/Next year buttons)
 - **Bills**: List all bills with search and delete functionality (X key)
 - **Add Wizard**: Multi-step wizard with detailed extraction preview and delete option
+- **Settings**: Configure LLM providers, API keys, models, and app settings
 
 **Keyboard Shortcuts:**
 - `d` - Dashboard
 - `s` - Statistics
 - `b` - Bills
 - `a` - Add Bills
+- `c` - Settings
 - `q` - Quit
 - `x` - Delete selected bill (in Bills screen)
 - `Esc` - Go back / Previous screen
@@ -180,41 +182,29 @@ medical-bill-analyzer stats --by practitioner --type Zahnarzt
 
 ## Configuration
 
-The application stores configuration in `~/.medical-bill-analyzer/config.yaml` (or `%APPDATA%/medical-bill-analyzer/config.yaml` on Windows).
+The application stores all configuration in the SQLite database at `~/.medical-bill-analyzer/data/medical_bills.db`.
 
-Example configuration:
-```yaml
-llm:
-  provider: anthropic  # Options: anthropic, openai, ollama
-  anthropic:
-    model: claude-sonnet-4-20250514
-    max_tokens: 1000
-    temperature: 0
-  openai:
-    model: gpt-4o-mini
-    max_tokens: 1000
-    temperature: 0
-  ollama:
-    model: llama3.1:8b
-    base_url: http://localhost:11434
-    timeout: 60
+**Configuration includes:**
+- **LLM Provider**: Choose between Anthropic Claude, OpenAI GPT, LM Studio (local), or Ollama (local)
+- **API Keys**: Stored securely in the database (for cloud providers)
+- **Model Settings**: Model name, max tokens, temperature
+- **Base URLs**: For LM Studio and Ollama local endpoints
+- **Bonus Threshold**: Your annual PKV bonus amount in EUR
+- **Storage Paths**: Database and PDF storage locations
 
-storage:
-  database_path: ~/.medical-bill-analyzer/data/medical_bills.db
-  pdf_storage_path: ~/.medical-bill-analyzer/data/pdfs/
+**Configure via:**
+1. **Setup Wizard** (first run): `medical-bill-analyzer setup`
+2. **TUI Settings Screen**: Press `c` in the TUI to open Settings
+3. **Direct Database**: All settings are in the `settings` table (single row)
 
-bonus:
-  default_threshold: 1000  # EUR
-```
-
-**Note**: API keys are stored securely in the database, not in the config file. The setup wizard prompts you to enter your API key and saves it to the database.
+**LM Studio Users**: Just paste the URL shown in LM Studio (e.g., `http://127.0.0.1:1234`). The app automatically adds `/v1` for OpenAI API compatibility.
 
 ## Data Privacy
 
-- **Local Storage**: All PDFs, extracted data, and API keys are stored locally on your machine in `~/.medical-bill-analyzer/`
-- **API Keys**: Stored securely in the local SQLite database (not in environment variables or config files)
+- **Local Storage**: All PDFs, extracted data, settings, and API keys are stored locally in `~/.medical-bill-analyzer/data/`
+- **Database Storage**: All configuration and credentials are in the SQLite database (not in config files or environment variables)
 - **Cloud LLM Providers**: Only the extracted text is sent to the LLM API (not the PDF file itself)
-- **Local Option**: Use Ollama for completely local processing with no data sent to external services
+- **Local Option**: Use LM Studio or Ollama for completely local processing with no data sent to external services
 
 ## Development
 
@@ -241,12 +231,13 @@ bonus:
 - ✅ CLI stats command with Rich tables
 - ✅ Comprehensive testing (440 tests, 62% coverage)
 
-**Phase 4a (75% Complete)**: Interactive Text User Interface
+**Phase 4a (85% Complete)**: Interactive Text User Interface
 - ✅ TUI framework with Textual
 - ✅ Dashboard screen (2024 summary, recent bills)
 - ✅ Statistics screen (practitioner/category/monthly tabs)
-- ✅ Bills screen (list, search)
+- ✅ Bills screen (list, search, delete)
 - ✅ Add Wizard (multi-step PDF processing)
+- ✅ Settings screen (LLM provider config, API keys)
 - ✅ Navigation system (keyboard shortcuts)
 - ✅ Auto-launch when no CLI args
 - ⏸️  TUI testing (deferred)

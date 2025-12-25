@@ -36,9 +36,10 @@ class OpenAIProvider(LLMProvider):
         Args:
             config: Configuration dict with keys:
                 - model: GPT model name (e.g., "gpt-4o-mini")
-                - api_key: OpenAI API key
+                - api_key: OpenAI API key (or dummy key for local endpoints)
                 - max_tokens: Maximum tokens in response (default: 1000)
                 - temperature: Temperature for generation (default: 0)
+                - base_url: Optional base URL for OpenAI-compatible endpoints (e.g., LM Studio)
         """
         super().__init__(config)
 
@@ -46,7 +47,11 @@ class OpenAIProvider(LLMProvider):
         if not api_key:
             raise ValueError("OpenAI API key is required")
 
-        self.client = OpenAI(api_key=api_key)
+        base_url = config.get("base_url")
+        if base_url:
+            self.client = OpenAI(api_key=api_key, base_url=base_url)
+        else:
+            self.client = OpenAI(api_key=api_key)
         self.max_tokens = config.get("max_tokens", 1000)
         self.temperature = config.get("temperature", 0)
 

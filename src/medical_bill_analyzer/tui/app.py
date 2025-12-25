@@ -41,6 +41,7 @@ class MedicalBillAnalyzerTUI(App):
         Binding("s", "show_stats", "Statistics"),
         Binding("b", "show_bills", "Bills"),
         Binding("a", "show_add_wizard", "Add"),
+        Binding("c", "show_settings", "Settings"),
         Binding("escape", "app.pop_screen", "Back", show=False),
     ]
 
@@ -100,6 +101,19 @@ class MedicalBillAnalyzerTUI(App):
         except ImportError:
             self.notify(
                 "Add wizard not yet implemented",
+                severity="warning",
+                timeout=3,
+            )
+
+    def action_show_settings(self) -> None:
+        """Navigate to settings screen."""
+        try:
+            from .screens.settings import SettingsScreen
+
+            self.push_screen(SettingsScreen())
+        except ImportError:
+            self.notify(
+                "Settings screen not yet implemented",
                 severity="warning",
                 timeout=3,
             )

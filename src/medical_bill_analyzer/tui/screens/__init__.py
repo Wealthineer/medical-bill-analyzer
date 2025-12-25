@@ -5,11 +5,13 @@ Each screen represents a different view in the application:
 - Stats: Statistics with practitioner/category/monthly tabs
 - Bills: List all bills with search functionality
 - AddWizard: Multi-step wizard for adding PDF bills
+- Settings: Configure LLM providers and app settings
 """
 
 from .add_wizard import AddWizardScreen
 from .bills import BillsScreen
 from .dashboard import DashboardScreen
+from .settings import SettingsScreen
 from .stats import StatsScreen
 
 __all__ = [
@@ -17,4 +19,5 @@ __all__ = [
     "StatsScreen",
     "BillsScreen",
     "AddWizardScreen",
+    "SettingsScreen",
 ]
