@@ -44,23 +44,30 @@ There are two ways to install Medical Bill Analyzer:
 
 Download the pre-built executable for your platform - no Python installation required!
 
-**Linux/macOS:**
+**Download from GitHub Releases:**
+1. Go to [Releases](https://github.com/Wealthineer/medical-bill-analyzer/releases)
+2. Download the package for your platform:
+   - **Linux**: `medical-bill-analyzer-linux-amd64.tar.gz`
+   - **macOS**: `medical-bill-analyzer-macos-amd64.tar.gz`
+   - **Windows**: `medical-bill-analyzer-windows-amd64.zip`
+
+**Linux/macOS Installation:**
 ```bash
-# Download the release package
-tar -xzvf medical-bill-analyzer-v1.0.0-linux.tar.gz
-cd medical-bill-analyzer-v1.0.0-linux
+# Extract the archive
+tar -xzvf medical-bill-analyzer-linux-amd64.tar.gz
+
+# Make executable (if needed)
+chmod +x medical-bill-analyzer-linux-amd64
 
 # Run the application
-./medical-bill-analyzer
+./medical-bill-analyzer-linux-amd64
 ```
 
-**Windows:**
-```bash
-# Extract the zip file
-# Run medical-bill-analyzer.exe
-```
+**Windows Installation:**
+1. Extract the zip file
+2. Double-click `medical-bill-analyzer-windows-amd64.exe`
 
-On first run, the application will automatically open the Settings screen to configure your LLM provider.
+**First Run:** The application will automatically open the Settings screen to configure your LLM provider (Anthropic, OpenAI, LM Studio, or Ollama).
 
 ### Option 2: From Source (For Developers)
 
