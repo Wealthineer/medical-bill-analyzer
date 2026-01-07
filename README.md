@@ -315,22 +315,44 @@ scripts\build.bat
 # Creates: releases/medical-bill-analyzer-v1.0.0-linux.tar.gz
 ```
 
-### Automated Releases (GitHub Actions)
+### Creating a New Release
 
-The repository includes a GitHub Actions workflow that automatically builds executables for all platforms when you push a version tag:
+The repository uses GitHub Actions to automatically build and publish releases for all platforms.
 
+**Step 1: Update version in pyproject.toml**
 ```bash
-# Tag a release
-git tag v1.0.0
-git push origin v1.0.0
+# Edit pyproject.toml and update the version
+# version = "1.0.0" -> version = "1.1.0"
 ```
 
-This will:
-1. Run the full test suite
-2. Build executables for Linux, macOS, and Windows
-3. Create a GitHub release with all platform downloads
+**Step 2: Commit the version bump**
+```bash
+git add pyproject.toml
+git commit -m "chore: bump version to v1.1.0"
+git push origin main
+```
 
-You can also trigger builds manually from the Actions tab in GitHub.
+**Step 3: Create and push a version tag**
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+**What happens automatically:**
+1. GitHub Actions runs the full test suite (492 tests)
+2. If tests pass, builds executables for Linux, macOS, and Windows in parallel
+3. Creates a GitHub Release with:
+   - `medical-bill-analyzer-linux-amd64.tar.gz`
+   - `medical-bill-analyzer-macos-amd64.tar.gz`
+   - `medical-bill-analyzer-windows-amd64.zip`
+4. Release is published at [github.com/Wealthineer/medical-bill-analyzer/releases](https://github.com/Wealthineer/medical-bill-analyzer/releases)
+
+**Version numbering:** Use [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH)
+- MAJOR: Breaking changes
+- MINOR: New features (backward compatible)
+- PATCH: Bug fixes
+
+**Manual trigger:** You can also trigger builds from the [Actions tab](https://github.com/Wealthineer/medical-bill-analyzer/actions) without creating a tag (useful for testing).
 
 ### Running Tests
 
