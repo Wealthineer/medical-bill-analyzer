@@ -308,6 +308,23 @@ scripts\build.bat
 # Creates: releases/medical-bill-analyzer-v1.0.0-linux.tar.gz
 ```
 
+### Automated Releases (GitHub Actions)
+
+The repository includes a GitHub Actions workflow that automatically builds executables for all platforms when you push a version tag:
+
+```bash
+# Tag a release
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+This will:
+1. Run the full test suite
+2. Build executables for Linux, macOS, and Windows
+3. Create a GitHub release with all platform downloads
+
+You can also trigger builds manually from the Actions tab in GitHub.
+
 ### Running Tests
 
 The project includes a comprehensive automated test suite covering all implemented modules.
