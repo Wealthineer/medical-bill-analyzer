@@ -35,41 +35,8 @@ class TestSettings:
         assert settings.llm.anthropic.model == "claude-sonnet-4-20250514"
         assert settings.bonus.default_threshold == 1000
 
-    def test_settings_to_yaml(self, temp_dir, sample_config_data):
-        """Test saving settings to YAML."""
-        settings = Settings(**sample_config_data)
-        yaml_path = temp_dir / "config.yaml"
-
-        settings.to_yaml(yaml_path)
-
-        assert yaml_path.exists()
-        with open(yaml_path) as f:
-            data = yaml.safe_load(f)
-        assert data["llm"]["provider"] == "anthropic"
-        assert data["bonus"]["default_threshold"] == 1000
-
-    def test_settings_from_yaml(self, temp_dir, sample_config_data):
-        """Test loading settings from YAML."""
-        yaml_path = temp_dir / "config.yaml"
-
-        # Write config
-        with open(yaml_path, "w") as f:
-            yaml.dump(sample_config_data, f)
-
-        # Load config
-        settings = Settings.from_yaml(yaml_path)
-
-        assert settings.llm.provider == "anthropic"
-        assert settings.bonus.default_threshold == 1000
-
-    def test_settings_from_nonexistent_yaml(self, temp_dir):
-        """Test loading from non-existent file returns defaults."""
-        yaml_path = temp_dir / "nonexistent.yaml"
-        settings = Settings.from_yaml(yaml_path)
-
-        # Should return default settings
-        assert settings.llm.provider == "anthropic"
-        assert settings.bonus.default_threshold == 1000.0
+    # Note: to_yaml and from_yaml methods were removed as part of the
+    # settings refactor - settings are now stored in the database
 
 
 class TestLLMConfig:
@@ -153,10 +120,10 @@ class TestConfigHelpers:
         assert config_dir.is_absolute()
 
     def test_get_config_path(self):
-        """Test getting config file path."""
+        """Test getting config file path (now returns database path)."""
         config_path = get_config_path()
-        assert config_path.name == "config.yaml"
-        assert config_path.parent.name == ".medical-bill-analyzer"
+        assert config_path.name == "medical_bills.db"
+        assert config_path.parent.name == "data"
 
     def test_is_first_run(self):
         """Test first run detection."""

@@ -84,7 +84,7 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 - [ ] 4a.7 Coverage analysis screen (skipped - depends on Phase 3)
 - [x] 4a.8 Keyboard shortcuts
 - [x] 4a.9 Settings screen
-- [ ] 4a.10 TUI testing (deferred)
+- [x] 4a.10 TUI testing
 
 **Acceptance Criteria:**
 - [x] TUI launches and displays dashboard
@@ -137,30 +137,35 @@ This file tracks the overall implementation progress. Each phase has a detailed 
   - ✅ CLI stats command with Rich tables
   - ✅ Unit tests (41 tests) and integration tests (14 tests)
 - **Phase 3**: 0% complete (deferred)
-- **Phase 4a**: 🚧 85% complete (7/9 tasks)
+- **Phase 4a**: ✅ 90% complete (8/9 tasks)
   - ✅ TUI framework setup (Textual integration, main app, entry point)
-  - ✅ Dashboard screen (2024 summary, recent bills)
-  - ✅ Statistics screen (practitioner/category/monthly tabs)
+  - ✅ Dashboard screen (current year summary, recent bills)
+  - ✅ Statistics screen (practitioner stats with year navigation)
   - ✅ Bills screen (list all bills, search functionality, delete)
   - ✅ Add Wizard screen (multi-step PDF processing)
   - ✅ Settings screen (LLM provider config, API keys, test connection)
   - ✅ Navigation system (keyboard shortcuts: d, s, b, a, c, q, r, x, Esc)
+  - ✅ TUI testing (33 tests using Textual's run_test())
   - ⏭️  Coverage Analysis Screen (skipped - depends on Phase 3)
-  - ⏸️  TUI testing (deferred)
 - **Phase 4b**: 0% complete (credential storage foundation complete)
 
-**Overall**: 48% complete (24/50 tasks)
+**Overall**: 50% complete (25/50 tasks)
 
 **🎉 Phase 1 MVP is complete and fully functional!**
 **🎉 Phase 2 Enhanced Analytics is complete!**
 **🎉 Phase 4a TUI is complete and fully functional!**
 
 ### Testing Status
+- **Total**: ✅ 470 tests, 59% coverage
 - **Phase 1 (Complete)**: ✅ 407 tests, 59% coverage (CLI code not fully tested)
 - **Phase 2 (Complete)**: ✅ 55 tests total, 98-100% coverage
   - Unit tests: 41 tests (models, engine), 100% coverage
   - Integration tests: 14 tests with real database, 98% coverage
-- **Configuration**: 15 tests, 91% coverage
+- **Phase 4a (TUI)**: ✅ 33 tests, app 81%, screens 18-89% coverage
+  - App tests: 11 tests (bindings, navigation, async startup)
+  - Screen tests: 22 tests (compose, events, state)
+  - Uses Textual's `run_test()` for async integration
+- **Configuration**: 12 tests, 91% coverage
 - **Utilities**: 74 tests, 93-100% coverage (logger: 27% - deferred)
 - **Exceptions**: 10 tests, 100% coverage
 - **Database**: 93 tests, 87-99% coverage
@@ -208,6 +213,24 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 ---
 
 ## Recent Updates
+
+### 2026-01-07 - TUI Testing Complete ✅
+- **Phase 4a is now 90% complete (8/9 tasks) - TUI testing added!**
+- Added 33 TUI tests using Textual's native testing framework
+- **Test Files**:
+  - `test_app.py`: 11 tests (bindings, navigation actions, async startup)
+  - `test_screens.py`: 22 tests (all 5 screens: Dashboard, Bills, Stats, AddWizard, Settings)
+- **Testing Approach**:
+  - Simple unit tests for CSS, bindings, initialization state
+  - Method delegation tests for button/event handlers
+  - Async integration tests using `run_test()` for proper app context
+- **Bug Fixes**:
+  - Fixed v3 migration missing `schema_version` update
+  - Removed obsolete YAML-based settings tests (`to_yaml`, `from_yaml`)
+  - Updated migration version assertions from v2 to v3
+- **Dependencies**: Added `pytest-asyncio ^0.24.0`
+- **Test Results**: 470 passed, 59% coverage
+- **TUI Coverage**: app.py 81%, Dashboard 89%, Stats 42%, Bills 24%, AddWizard 21%, Settings 18%
 
 ### 2025-12-25 - Major Refactor: Settings to Database + Settings Screen ✅
 - **Phase 4a is now 85% complete (7/9 tasks) - Settings screen + database refactor!**
@@ -503,4 +526,4 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 
 ---
 
-Last Updated: 2025-12-23
+Last Updated: 2026-01-07

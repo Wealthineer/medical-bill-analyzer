@@ -229,9 +229,9 @@ The application stores all configuration in the SQLite database at `~/.medical-b
 - ✅ Category breakdown with percentages
 - ✅ Monthly time-series analysis
 - ✅ CLI stats command with Rich tables
-- ✅ Comprehensive testing (440 tests, 62% coverage)
+- ✅ Comprehensive testing (470 tests, 59% coverage)
 
-**Phase 4a (85% Complete)**: Interactive Text User Interface
+**Phase 4a (90% Complete)**: Interactive Text User Interface
 - ✅ TUI framework with Textual
 - ✅ Dashboard screen (2024 summary, recent bills)
 - ✅ Statistics screen (practitioner/category/monthly tabs)
@@ -240,7 +240,7 @@ The application stores all configuration in the SQLite database at `~/.medical-b
 - ✅ Settings screen (LLM provider config, API keys)
 - ✅ Navigation system (keyboard shortcuts)
 - ✅ Auto-launch when no CLI args
-- ⏸️  TUI testing (deferred)
+- ✅ TUI testing (33 tests)
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed progress tracking.
 
@@ -276,7 +276,7 @@ pytest tests/integration/
 
 ### Test Coverage
 
-**Current Status**: 440 tests, 62% overall coverage
+**Current Status**: 470 tests, 59% overall coverage
 
 | Module | Tests | Coverage | Type |
 |--------|-------|----------|------|
@@ -307,7 +307,8 @@ pytest tests/integration/
 | **Analytics Integration** | **14** | **98%** | **Integration** |
 
 **Testing Strategy:**
-- **Unit tests (407)**: Fast, mocked dependencies, test all code paths
+- **Unit tests (437)**: Fast, mocked dependencies, test all code paths
+  - Includes 33 TUI tests using Textual's `run_test()`
 - **Integration tests (33)**: Real PDFs and database, end-to-end validation
   - PDF integration: 19 tests with real German medical bill PDFs
   - Analytics integration: 14 tests with real database queries
@@ -332,11 +333,12 @@ tests/
 │       ├── multipage_bill.pdf
 │       ├── minimal_text.pdf
 │       └── empty_text.pdf
-├── unit/                    # Unit tests (300 tests, mocked)
+├── unit/                    # Unit tests (437 tests, mocked)
 │   ├── test_config/         # Configuration module tests
 │   ├── test_utils/          # Utility function tests
 │   ├── test_core/           # Core module tests
 │   ├── test_database/       # Database layer tests
+│   ├── test_tui/            # TUI tests (33 tests)
 │   ├── test_pdf/            # PDF processing tests (mocked)
 │   └── test_llm/            # LLM provider tests (68 tests)
 │       ├── test_schemas.py  # Pydantic schema validation (28 tests)

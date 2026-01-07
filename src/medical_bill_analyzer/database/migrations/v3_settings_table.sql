@@ -57,3 +57,7 @@ INSERT OR IGNORE INTO settings (
     '~/.medical-bill-analyzer/data/medical_bills.db',
     '~/.medical-bill-analyzer/data/pdfs'
 );
+
+-- Update schema version
+INSERT OR REPLACE INTO schema_version (version, description, applied_at)
+VALUES (3, 'Add settings table', datetime('now'));
