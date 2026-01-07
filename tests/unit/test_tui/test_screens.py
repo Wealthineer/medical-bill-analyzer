@@ -224,24 +224,26 @@ class TestAsyncScreens:
 
         app = MedicalBillAnalyzerTUI()
 
-        with patch("medical_bill_analyzer.tui.screens.dashboard.load_config") as mock_config:
-            mock_settings = Mock()
-            mock_settings.bonus.default_threshold = 1000
-            mock_config.return_value = mock_settings
+        # Mock is_first_run to return False (not first run, so dashboard shows)
+        with patch("medical_bill_analyzer.config.settings.is_first_run", return_value=False):
+            with patch("medical_bill_analyzer.tui.screens.dashboard.load_config") as mock_config:
+                mock_settings = Mock()
+                mock_settings.bonus.default_threshold = 1000
+                mock_config.return_value = mock_settings
 
-            with patch("medical_bill_analyzer.tui.screens.dashboard.get_database_path"):
-                with patch("medical_bill_analyzer.tui.screens.dashboard.BillRepository") as mock_repo:
-                    mock_repo.return_value.filter.return_value = []
-                    mock_repo.return_value.get_all.return_value = []
+                with patch("medical_bill_analyzer.tui.screens.dashboard.get_database_path"):
+                    with patch("medical_bill_analyzer.tui.screens.dashboard.BillRepository") as mock_repo:
+                        mock_repo.return_value.filter.return_value = []
+                        mock_repo.return_value.get_all.return_value = []
 
-                    with patch("medical_bill_analyzer.tui.screens.dashboard.BonusCalculator") as mock_calc:
-                        mock_calc.return_value.calculate_total.return_value = Decimal("0")
-                        mock_rec = Mock()
-                        mock_rec.should_keep_bonus = True
-                        mock_calc.return_value.get_recommendation_for_year.return_value = mock_rec
+                        with patch("medical_bill_analyzer.tui.screens.dashboard.BonusCalculator") as mock_calc:
+                            mock_calc.return_value.calculate_total.return_value = Decimal("0")
+                            mock_rec = Mock()
+                            mock_rec.should_keep_bonus = True
+                            mock_calc.return_value.get_recommendation_for_year.return_value = mock_rec
 
-                        async with app.run_test() as pilot:
-                            assert app.is_running
+                            async with app.run_test() as pilot:
+                                assert app.is_running
 
     async def test_stats_screen_mounts(self):
         """Test stats screen can be mounted."""
@@ -249,17 +251,19 @@ class TestAsyncScreens:
 
         app = MedicalBillAnalyzerTUI()
 
-        with patch("medical_bill_analyzer.tui.screens.dashboard.load_config"):
-            with patch("medical_bill_analyzer.tui.screens.dashboard.get_database_path"):
-                with patch("medical_bill_analyzer.tui.screens.dashboard.BillRepository"):
-                    with patch("medical_bill_analyzer.tui.screens.dashboard.BonusCalculator"):
-                        with patch("medical_bill_analyzer.tui.screens.stats.load_config"):
-                            with patch("medical_bill_analyzer.tui.screens.stats.get_database_path"):
-                                with patch("medical_bill_analyzer.tui.screens.stats.BillRepository"):
-                                    with patch("medical_bill_analyzer.tui.screens.stats.AnalyticsEngine") as mock_engine:
-                                        mock_engine.return_value.get_practitioner_stats.return_value = []
+        # Mock is_first_run to return False (not first run, so dashboard shows)
+        with patch("medical_bill_analyzer.config.settings.is_first_run", return_value=False):
+            with patch("medical_bill_analyzer.tui.screens.dashboard.load_config"):
+                with patch("medical_bill_analyzer.tui.screens.dashboard.get_database_path"):
+                    with patch("medical_bill_analyzer.tui.screens.dashboard.BillRepository"):
+                        with patch("medical_bill_analyzer.tui.screens.dashboard.BonusCalculator"):
+                            with patch("medical_bill_analyzer.tui.screens.stats.load_config"):
+                                with patch("medical_bill_analyzer.tui.screens.stats.get_database_path"):
+                                    with patch("medical_bill_analyzer.tui.screens.stats.BillRepository"):
+                                        with patch("medical_bill_analyzer.tui.screens.stats.AnalyticsEngine") as mock_engine:
+                                            mock_engine.return_value.get_practitioner_stats.return_value = []
 
-                                        async with app.run_test() as pilot:
-                                            # Navigate to stats
-                                            await pilot.press("s")
-                                            assert app.is_running
+                                            async with app.run_test() as pilot:
+                                                # Navigate to stats
+                                                await pilot.press("s")
+                                                assert app.is_running

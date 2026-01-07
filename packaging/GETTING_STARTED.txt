@@ -1,0 +1,106 @@
+================================================================================
+               Medical Bill Analyzer - Getting Started
+================================================================================
+
+Thank you for downloading Medical Bill Analyzer!
+
+This application helps German private health insurance (PKV) customers:
+- Analyze medical bills with AI-powered extraction
+- Track healthcare spending over time
+- Make informed decisions about claim submission vs. bonus retention
+
+
+QUICK START
+-----------
+
+1. Open a terminal/command prompt in this directory
+
+2. Run the application:
+
+   Linux/macOS:
+     ./medical-bill-analyzer
+
+   Windows:
+     medical-bill-analyzer.exe
+
+3. On first run, the setup wizard will guide you through:
+   - Choosing an LLM provider (Anthropic Claude, OpenAI GPT, or local Ollama)
+   - Entering your API key (for cloud providers)
+   - Setting your annual bonus threshold
+
+4. After setup, the interactive TUI (Text User Interface) will launch.
+   Use keyboard shortcuts to navigate:
+
+     d - Dashboard (overview)
+     b - Bills (list all bills)
+     s - Statistics (spending analysis)
+     a - Add Bills (process new PDFs)
+     c - Settings (configure providers)
+     q - Quit
+
+
+ADDING BILLS
+------------
+
+Option 1: Through the TUI
+- Press 'a' to open the Add Bills wizard
+- Enter the path to a PDF file or directory
+- Tip: Drag and drop PDFs onto the terminal to paste their path
+
+Option 2: Through the CLI
+  ./medical-bill-analyzer add /path/to/bill.pdf
+  ./medical-bill-analyzer add /path/to/bills/ --recursive
+
+
+COMMAND LINE USAGE
+------------------
+
+The application also supports command-line usage:
+
+  ./medical-bill-analyzer setup        # Run setup wizard
+  ./medical-bill-analyzer add FILE     # Add a bill
+  ./medical-bill-analyzer list         # List all bills
+  ./medical-bill-analyzer total        # Calculate total costs
+  ./medical-bill-analyzer bonus-check  # Get bonus recommendation
+  ./medical-bill-analyzer stats        # View spending statistics
+  ./medical-bill-analyzer --help       # Show all commands
+
+
+DATA STORAGE
+------------
+
+All data is stored locally on your computer:
+
+  Linux/macOS: ~/.medical-bill-analyzer/
+  Windows:     %APPDATA%\medical-bill-analyzer\
+
+This includes:
+- Database with extracted bill information
+- Copied PDF files
+- Configuration and API keys
+
+
+TROUBLESHOOTING
+---------------
+
+"TUI failed to launch"
+  → The application requires a proper terminal emulator.
+  → On Windows, use Windows Terminal or PowerShell.
+  → On Linux, ensure you're in a graphical terminal (not a virtual console).
+
+"API key not found"
+  → Run the setup wizard: ./medical-bill-analyzer setup
+
+"Failed to extract text from PDF"
+  → Ensure the PDF contains selectable text (not scanned images).
+  → Some older or poorly formatted PDFs may not work.
+
+
+SUPPORT
+-------
+
+For issues and questions, please visit:
+https://github.com/Wealthineer/medical-bill-analyzer/issues
+
+
+================================================================================

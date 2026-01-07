@@ -51,8 +51,21 @@ class MedicalBillAnalyzerTUI(App):
         yield Footer()
 
     def on_mount(self) -> None:
-        """Called when app starts - launch dashboard."""
-        self.push_screen(DashboardScreen())
+        """Called when app starts - check first run, then launch dashboard."""
+        from medical_bill_analyzer.config.settings import is_first_run
+
+        if is_first_run():
+            # First run - show settings screen with welcome message
+            self.notify(
+                "Welcome! Please configure your LLM provider to get started.",
+                title="First Run Setup",
+                severity="information",
+                timeout=5,
+            )
+            from .screens.settings import SettingsScreen
+            self.push_screen(SettingsScreen())
+        else:
+            self.push_screen(DashboardScreen())
 
     def action_quit(self) -> None:
         """Quit the application."""

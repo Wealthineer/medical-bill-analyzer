@@ -131,14 +131,16 @@ class TestAppAsync:
         """Test app starts and shows dashboard on mount."""
         app = MedicalBillAnalyzerTUI()
 
-        # Patch the data loading to avoid database access
-        with patch("medical_bill_analyzer.tui.screens.dashboard.load_config"):
-            with patch("medical_bill_analyzer.tui.screens.dashboard.get_database_path"):
-                with patch("medical_bill_analyzer.tui.screens.dashboard.BillRepository"):
-                    with patch("medical_bill_analyzer.tui.screens.dashboard.BonusCalculator"):
-                        async with app.run_test() as pilot:
-                            # App should have started
-                            assert app.is_running
+        # Patch is_first_run to return False (not first run, so dashboard shows)
+        with patch("medical_bill_analyzer.config.settings.is_first_run", return_value=False):
+            # Patch the data loading to avoid database access
+            with patch("medical_bill_analyzer.tui.screens.dashboard.load_config"):
+                with patch("medical_bill_analyzer.tui.screens.dashboard.get_database_path"):
+                    with patch("medical_bill_analyzer.tui.screens.dashboard.BillRepository"):
+                        with patch("medical_bill_analyzer.tui.screens.dashboard.BonusCalculator"):
+                            async with app.run_test() as pilot:
+                                # App should have started
+                                assert app.is_running
 
-                            # Should have at least one screen
-                            assert len(app.screen_stack) >= 1
+                                # Should have at least one screen
+                                assert len(app.screen_stack) >= 1

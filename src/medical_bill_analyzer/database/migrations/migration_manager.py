@@ -1,6 +1,7 @@
 """Database migration manager for applying schema updates."""
 
 import sqlite3
+import sys
 from pathlib import Path
 from typing import List, Tuple
 
@@ -8,6 +9,21 @@ from ...core.exceptions import DatabaseError
 from ...utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+def get_migrations_dir() -> Path:
+    """Get the migrations directory, handling PyInstaller bundled executables.
+
+    Returns:
+        Path to the migrations directory
+    """
+    if getattr(sys, 'frozen', False):
+        # Running as bundled executable (PyInstaller)
+        base_path = Path(sys._MEIPASS)  # type: ignore
+        return base_path / "medical_bill_analyzer" / "database" / "migrations"
+    else:
+        # Running in development
+        return Path(__file__).parent
 
 
 class MigrationManager:
@@ -21,7 +37,7 @@ class MigrationManager:
             db_path: Path to SQLite database file
         """
         self.db_path = db_path
-        self.migrations_dir = Path(__file__).parent
+        self.migrations_dir = get_migrations_dir()
 
     def get_current_version(self, conn: sqlite3.Connection) -> int:
         """

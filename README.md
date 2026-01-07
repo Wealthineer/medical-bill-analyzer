@@ -26,17 +26,49 @@ A desktop application for German private health insurance (PKV) customers to ana
 - ✅ Smart path handling for drag-and-drop PDFs
 - ✅ Auto-launches when no CLI args provided
 
+### Phase 4b: Standalone Executable
+- ✅ PyInstaller packaging for standalone executable
+- ✅ No Python installation required
+- ✅ First-run detection with automatic Settings redirect
+- ✅ Build scripts for Linux, macOS, and Windows
+- ✅ 44 MB executable size (well under 100 MB target)
+
 ### Future Phases
 - **Phase 3**: Line item extraction and insurance coverage analysis
-- **Phase 4b**: Standalone executable packaging
 
 ## Installation
 
-### Requirements
-- Python 3.10 or higher
-- pip or poetry
+There are two ways to install Medical Bill Analyzer:
 
-### Setup
+### Option 1: Standalone Executable (Recommended for Users)
+
+Download the pre-built executable for your platform - no Python installation required!
+
+**Linux/macOS:**
+```bash
+# Download the release package
+tar -xzvf medical-bill-analyzer-v1.0.0-linux.tar.gz
+cd medical-bill-analyzer-v1.0.0-linux
+
+# Run the application
+./medical-bill-analyzer
+```
+
+**Windows:**
+```bash
+# Extract the zip file
+# Run medical-bill-analyzer.exe
+```
+
+On first run, the application will automatically open the Settings screen to configure your LLM provider.
+
+### Option 2: From Source (For Developers)
+
+**Requirements:**
+- Python 3.10 - 3.13
+- Poetry (recommended) or pip
+
+**Setup:**
 
 1. Clone the repository:
 ```bash
@@ -54,23 +86,32 @@ Or using pip:
 pip install -e .
 ```
 
-> **✅ Current Status**: Phases 1, 2, and 4a complete!
+3. Run the application:
+```bash
+# Launch TUI (interactive mode)
+poetry run medical-bill-analyzer
+
+# Or run specific commands
+poetry run medical-bill-analyzer setup
+poetry run medical-bill-analyzer add /path/to/bill.pdf
+```
+
+> **✅ Current Status**: Phases 1, 2, 4a, and 4b complete!
 >
 > - **TUI Mode** (recommended): Just run `medical-bill-analyzer` with no arguments for an interactive interface
 > - **CLI Mode**: Use commands like `medical-bill-analyzer setup`, `medical-bill-analyzer add`, etc.
-> - Start with `medical-bill-analyzer setup` to configure the application
+> - On first run, the app automatically guides you through setup
 
-3. Run the setup wizard:
-```bash
-medical-bill-analyzer setup
-```
+### First Run Setup
 
-The setup wizard will guide you through:
-- Choosing an LLM provider (Anthropic, OpenAI, or Ollama)
+On first run (either packaged or from source), you'll be guided through:
+- Choosing an LLM provider (Anthropic, OpenAI, LM Studio, or Ollama)
 - Entering your API key (if using cloud provider)
 - Setting your bonus threshold
 - Testing the connection
 - Initializing the database
+
+All settings are stored in `~/.medical-bill-analyzer/data/`
 
 ## Usage
 
@@ -210,39 +251,62 @@ The application stores all configuration in the SQLite database at `~/.medical-b
 
 ### Project Status
 
-**Current Implementation**: Phase 4a - TUI Functional (75%)!
+**Current Implementation**: All core phases complete!
 
 **Phase 1 (Complete)**: Core Functionality (MVP)
-- ✅ Project infrastructure setup
-- ✅ Configuration management
-- ✅ Utilities and logging
-- ✅ Database layer with SQLite
-- ✅ PDF processing pipeline
-- ✅ LLM provider abstraction layer (Anthropic, OpenAI, Ollama)
-- ✅ Information extraction pipeline (BillExtractor)
-- ✅ Core business logic (BillProcessor, BonusCalculator)
-- ✅ CLI commands (setup, add, list, total, bonus-check)
-- ✅ Database credential storage (Phase 4b ready)
+- ✅ PDF bill processing with LLM-based extraction
+- ✅ Support for Anthropic Claude, OpenAI GPT, and local Ollama
+- ✅ SQLite database for local data storage
+- ✅ CLI commands (setup, add, list, delete, total, bonus-check)
 
 **Phase 2 (Complete)**: Enhanced Analytics
 - ✅ Practitioner-level spending statistics
 - ✅ Category breakdown with percentages
 - ✅ Monthly time-series analysis
-- ✅ CLI stats command with Rich tables
-- ✅ Comprehensive testing (470 tests, 59% coverage)
+- ✅ Rich table output
 
-**Phase 4a (90% Complete)**: Interactive Text User Interface
-- ✅ TUI framework with Textual
-- ✅ Dashboard screen (2024 summary, recent bills)
-- ✅ Statistics screen (practitioner/category/monthly tabs)
-- ✅ Bills screen (list, search, delete)
-- ✅ Add Wizard (multi-step PDF processing)
-- ✅ Settings screen (LLM provider config, API keys)
-- ✅ Navigation system (keyboard shortcuts)
-- ✅ Auto-launch when no CLI args
-- ✅ TUI testing (33 tests)
+**Phase 4a (Complete)**: Interactive Text User Interface
+- ✅ Dashboard, Statistics, Bills, Add Wizard, Settings screens
+- ✅ Keyboard navigation
+- ✅ First-run detection
+
+**Phase 4b (Complete)**: Packaging & Distribution
+- ✅ PyInstaller standalone executable (44 MB)
+- ✅ Build scripts for Linux, macOS, Windows
+- ✅ No Python installation required
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed progress tracking.
+
+### Building the Executable
+
+To build a standalone executable from source:
+
+**Linux/macOS:**
+```bash
+# Build executable (runs tests first)
+./scripts/build.sh
+
+# Skip tests (faster, not recommended)
+./scripts/build.sh --skip-tests
+
+# Clean build artifacts first
+./scripts/build.sh --clean
+```
+
+**Windows:**
+```bash
+scripts\build.bat
+```
+
+**Output:**
+- Linux/macOS: `dist/medical-bill-analyzer` (44 MB)
+- Windows: `dist/medical-bill-analyzer.exe`
+
+**Create a release package:**
+```bash
+./scripts/package-release.sh [VERSION]
+# Creates: releases/medical-bill-analyzer-v1.0.0-linux.tar.gz
+```
 
 ### Running Tests
 
@@ -276,7 +340,7 @@ pytest tests/integration/
 
 ### Test Coverage
 
-**Current Status**: 470 tests, 59% overall coverage
+**Current Status**: 492 tests, 59% overall coverage
 
 | Module | Tests | Coverage | Type |
 |--------|-------|----------|------|
