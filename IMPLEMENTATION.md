@@ -237,7 +237,7 @@ This file tracks the overall implementation progress. Each phase has a detailed 
   - **Trigger**: On version tags (v*) or manual workflow dispatch
   - **Test Job**: Runs full pytest suite before building
   - **Build Matrix**: ubuntu-latest, macos-latest, windows-latest
-  - **Caching**: Poetry dependencies cached for faster builds
+  - **Caching**: uv dependencies cached for faster builds
   - **Artifacts**: Platform-specific executables (30-day retention)
   - **Release**: Automatic GitHub release with all platform downloads
 - **Usage**:

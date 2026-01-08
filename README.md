@@ -73,7 +73,7 @@ chmod +x medical-bill-analyzer-linux-amd64
 
 **Requirements:**
 - Python 3.10 - 3.13
-- Poetry (recommended) or pip
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
 
 **Setup:**
 
@@ -83,9 +83,9 @@ git clone <repository-url>
 cd medical-bill-analyzer
 ```
 
-2. Install dependencies using Poetry:
+2. Install dependencies using uv:
 ```bash
-poetry install
+uv sync
 ```
 
 Or using pip:
@@ -96,11 +96,11 @@ pip install -e .
 3. Run the application:
 ```bash
 # Launch TUI (interactive mode)
-poetry run medical-bill-analyzer
+uv run medical-bill-analyzer
 
 # Or run specific commands
-poetry run medical-bill-analyzer setup
-poetry run medical-bill-analyzer add /path/to/bill.pdf
+uv run medical-bill-analyzer setup
+uv run medical-bill-analyzer add /path/to/bill.pdf
 ```
 
 > **✅ Current Status**: Phases 1, 2, 4a, and 4b complete!
@@ -360,28 +360,28 @@ The project includes a comprehensive automated test suite covering all implement
 
 **Run all tests:**
 ```bash
-pytest
+uv run pytest
 ```
 
 **Run with coverage report:**
 ```bash
-pytest --cov=medical_bill_analyzer --cov-report=html --cov-report=term
+uv run pytest --cov=medical_bill_analyzer --cov-report=html --cov-report=term
 ```
 
 **Run specific test module:**
 ```bash
-pytest tests/unit/test_config/
-pytest tests/unit/test_utils/test_date_utils.py
+uv run pytest tests/unit/test_config/
+uv run pytest tests/unit/test_utils/test_date_utils.py
 ```
 
 **Run only unit tests (fast):**
 ```bash
-pytest tests/unit/
+uv run pytest tests/unit/
 ```
 
 **Run only integration tests:**
 ```bash
-pytest tests/integration/
+uv run pytest tests/integration/
 ```
 
 ### Test Coverage
@@ -467,13 +467,13 @@ python scripts/generate_test_pdfs.py
 
 ### Code Formatting
 ```bash
-poetry run black src tests
-poetry run ruff check src tests
+uv run black src tests
+uv run ruff check src tests
 ```
 
 ### Type Checking
 ```bash
-poetry run mypy src
+uv run mypy src
 ```
 
 ### Development Workflow

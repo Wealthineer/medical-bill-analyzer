@@ -75,7 +75,7 @@ datas=[
 - [x] Report success/failure
 
 ### Build Script Steps:
-1. Install dependencies (poetry install)
+1. Install dependencies (uv sync)
 2. Run test suite (`pytest`)
 3. Build with `pyinstaller packaging/medical-bill-analyzer.spec`
 4. Test executable (`./dist/medical-bill-analyzer setup`)
@@ -221,7 +221,7 @@ medical-bill-analyzer-v1.0.0-linux.tar.gz
 - **Trigger**: On version tags (v*) or manual workflow dispatch
 - **Test Job**: Runs full test suite before building
 - **Build Matrix**: ubuntu-latest, macos-latest, windows-latest
-- **Caching**: Poetry dependencies cached for faster builds
+- **Caching**: uv dependencies cached for faster builds
 - **Artifacts**: Each platform uploaded separately (30-day retention)
 - **Release**: Automatic GitHub release with all platform downloads
 

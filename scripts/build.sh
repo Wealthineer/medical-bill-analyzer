@@ -61,22 +61,22 @@ fi
 
 # Step 2: Check dependencies
 echo -e "${YELLOW}Checking dependencies...${NC}"
-if ! command -v poetry &> /dev/null; then
-    echo -e "${RED}Error: Poetry is not installed.${NC}"
-    echo "Please install Poetry: https://python-poetry.org/docs/#installation"
+if ! command -v uv &> /dev/null; then
+    echo -e "${RED}Error: uv is not installed.${NC}"
+    echo "Please install uv: https://docs.astral.sh/uv/getting-started/installation/"
     exit 1
 fi
 
 # Install dependencies
 echo "Installing dependencies..."
-poetry install --quiet
+uv sync --quiet
 echo -e "${GREEN}Dependencies installed.${NC}"
 echo ""
 
 # Step 3: Run tests (unless skipped)
 if [ "$SKIP_TESTS" = false ]; then
     echo -e "${YELLOW}Running tests...${NC}"
-    if poetry run pytest -q --tb=short; then
+    if uv run pytest -q --tb=short; then
         echo -e "${GREEN}All tests passed!${NC}"
     else
         echo -e "${RED}Tests failed. Aborting build.${NC}"
@@ -91,7 +91,7 @@ fi
 
 # Step 4: Build executable
 echo -e "${YELLOW}Building executable with PyInstaller...${NC}"
-poetry run pyinstaller packaging/medical-bill-analyzer.spec --noconfirm
+uv run pyinstaller packaging/medical-bill-analyzer.spec --noconfirm
 
 # Check if build succeeded
 if [ -f "dist/medical-bill-analyzer" ]; then

@@ -51,16 +51,16 @@ if "%CLEAN%"=="true" (
 
 REM Step 2: Check dependencies
 echo Checking dependencies...
-where poetry >nul 2>&1
+where uv >nul 2>&1
 if errorlevel 1 (
-    echo Error: Poetry is not installed.
-    echo Please install Poetry: https://python-poetry.org/docs/#installation
+    echo Error: uv is not installed.
+    echo Please install uv: https://docs.astral.sh/uv/getting-started/installation/
     exit /b 1
 )
 
 REM Install dependencies
 echo Installing dependencies...
-poetry install --quiet
+uv sync --quiet
 if errorlevel 1 (
     echo Error: Failed to install dependencies.
     exit /b 1
@@ -71,7 +71,7 @@ echo.
 REM Step 3: Run tests (unless skipped)
 if "%SKIP_TESTS%"=="false" (
     echo Running tests...
-    poetry run pytest -q --tb=short
+    uv run pytest -q --tb=short
     if errorlevel 1 (
         echo Tests failed. Aborting build.
         echo Use --skip-tests to build anyway ^(not recommended^).
@@ -86,7 +86,7 @@ if "%SKIP_TESTS%"=="false" (
 
 REM Step 4: Build executable
 echo Building executable with PyInstaller...
-poetry run pyinstaller packaging\medical-bill-analyzer.spec --noconfirm
+uv run pyinstaller packaging\medical-bill-analyzer.spec --noconfirm
 if errorlevel 1 (
     echo Build failed.
     exit /b 1
