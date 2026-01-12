@@ -23,8 +23,8 @@ def main():
 
     Otherwise falls back to CLI mode.
     """
-    # If no arguments and in a TTY, try to launch TUI
-    if len(sys.argv) == 1 and sys.stdout.isatty():
+    # If no arguments, try to launch TUI
+    if len(sys.argv) == 1:
         try:
             from medical_bill_analyzer.tui.app import MedicalBillAnalyzerTUI
 
