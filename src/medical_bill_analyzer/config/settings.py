@@ -154,6 +154,7 @@ def get_config_path() -> Path:
 def is_first_run() -> bool:
     """Check if this is the first run (no settings in database)."""
     from ..database import SettingsRepository
+    from ..core.exceptions import DatabaseError
 
     db_path = get_config_path()
     if not db_path.exists():
@@ -163,8 +164,8 @@ def is_first_run() -> bool:
         repo = SettingsRepository(db_path)
         repo.get_settings()
         return False
-    except ValueError:
-        # Settings not found in database
+    except (ValueError, DatabaseError):
+        # Settings not found in database or database not initialized
         return True
 
 
