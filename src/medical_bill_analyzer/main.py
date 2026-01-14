@@ -31,15 +31,17 @@ def main():
             tui_app = MedicalBillAnalyzerTUI()
             tui_app.run()
             return
-        except ImportError:
-            # Textual not installed, fall back to CLI
-            logger.debug("Textual not available, falling back to CLI")
-            pass
+        except ImportError as e:
+            # Textual or dependency not available
+            typer.secho(f"TUI not available: {e}", fg=typer.colors.YELLOW)
+            typer.secho("Run 'medical-bill-analyzer --help' for CLI usage", fg=typer.colors.BLUE)
+            return
         except Exception as e:
-            # TUI failed to launch, fall back to CLI
+            # TUI failed to launch
             logger.exception("TUI failed to launch")
             typer.secho(f"TUI failed to launch: {e}", fg=typer.colors.YELLOW)
-            typer.secho("Falling back to CLI mode", fg=typer.colors.BLUE)
+            typer.secho("Run 'medical-bill-analyzer --help' for CLI usage", fg=typer.colors.BLUE)
+            return
 
     # Use CLI
     try:
