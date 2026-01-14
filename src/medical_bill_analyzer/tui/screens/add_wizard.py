@@ -154,8 +154,9 @@ class AddWizardScreen(Screen):
     def _open_file_dialog(self, select_directory: bool = False) -> str | None:
         """Open native file picker in a separate thread.
 
-        Uses tkinter.filedialog which works cross-platform (macOS, Windows, Linux).
-        Runs in a worker thread to avoid blocking the Textual event loop.
+        Uses platform-specific methods:
+        - macOS: osascript (AppleScript) - avoids main thread requirement
+        - Windows/Linux: tkinter.filedialog
 
         Args:
             select_directory: If True, opens folder picker. If False, opens file picker.
@@ -163,15 +164,70 @@ class AddWizardScreen(Screen):
         Returns:
             Selected path as string, or None if cancelled.
         """
+        import platform
+        import subprocess
+
         try:
-            # Lazy import to avoid import errors when tkinter is not available
+            if platform.system() == "Darwin":
+                # macOS: Use osascript (AppleScript) to avoid main thread crash
+                return self._open_file_dialog_macos(select_directory)
+            else:
+                # Windows/Linux: Use tkinter
+                return self._open_file_dialog_tkinter(select_directory)
+        except Exception as e:
+            self.app.call_from_thread(
+                self.app.notify,
+                f"Could not open file picker: {e}",
+                severity="error",
+            )
+            return None
+
+    def _open_file_dialog_macos(self, select_directory: bool) -> str | None:
+        """Open file dialog on macOS using osascript."""
+        import subprocess
+
+        if select_directory:
+            script = '''
+            tell application "System Events"
+                activate
+                set folderPath to choose folder with prompt "Select folder containing PDF bills"
+                return POSIX path of folderPath
+            end tell
+            '''
+        else:
+            script = '''
+            tell application "System Events"
+                activate
+                set filePath to choose file with prompt "Select PDF bill" of type {"pdf"}
+                return POSIX path of filePath
+            end tell
+            '''
+
+        try:
+            result = subprocess.run(
+                ["osascript", "-e", script],
+                capture_output=True,
+                text=True,
+                timeout=300,  # 5 minute timeout
+            )
+            if result.returncode == 0:
+                path = result.stdout.strip()
+                return path if path else None
+            else:
+                # User cancelled or error
+                return None
+        except subprocess.TimeoutExpired:
+            return None
+
+    def _open_file_dialog_tkinter(self, select_directory: bool) -> str | None:
+        """Open file dialog using tkinter (Windows/Linux)."""
+        try:
             import tkinter as tk
             from tkinter import filedialog
 
             root = tk.Tk()
-            root.withdraw()  # Hide the root window
-            root.attributes("-topmost", True)  # Bring dialog to front
-            root.focus_force()  # Force focus on macOS
+            root.withdraw()
+            root.attributes("-topmost", True)
 
             if select_directory:
                 path = filedialog.askdirectory(
@@ -188,18 +244,9 @@ class AddWizardScreen(Screen):
             root.destroy()
             return path if path else None
         except ImportError:
-            # tkinter not available
             self.app.call_from_thread(
                 self.app.notify,
                 "File picker not available (tkinter not installed)",
-                severity="error",
-            )
-            return None
-        except Exception as e:
-            # Handle cases where tkinter/display is not available
-            self.app.call_from_thread(
-                self.app.notify,
-                f"Could not open file picker: {e}",
                 severity="error",
             )
             return None
