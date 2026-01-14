@@ -145,7 +145,7 @@ a = Analysis(
         "mypy",
         "pyinstaller",
         # Exclude unused packages
-        "tkinter",
+        # Note: tkinter is needed for native file picker dialog
         "unittest",
         "doctest",
     ],

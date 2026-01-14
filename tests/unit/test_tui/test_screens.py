@@ -140,6 +140,33 @@ class TestAddWizardScreen:
         screen.on_button_pressed(mock_event)
         screen._delete_added_bills.assert_called_once()
 
+    def test_browse_buttons_css_exists(self):
+        """Test CSS for browse buttons is defined."""
+        screen = AddWizardScreen()
+        assert "#browse-buttons" in screen.CSS
+
+    def test_browse_file_button_triggers_dialog(self):
+        """Test Browse File button triggers file dialog."""
+        screen = AddWizardScreen()
+        screen._open_file_dialog = Mock()
+
+        mock_event = Mock()
+        mock_event.button.id = "browse-file-btn"
+        screen.on_button_pressed(mock_event)
+
+        screen._open_file_dialog.assert_called_once_with(select_directory=False)
+
+    def test_browse_folder_button_triggers_dialog(self):
+        """Test Browse Folder button triggers directory dialog."""
+        screen = AddWizardScreen()
+        screen._open_file_dialog = Mock()
+
+        mock_event = Mock()
+        mock_event.button.id = "browse-folder-btn"
+        screen.on_button_pressed(mock_event)
+
+        screen._open_file_dialog.assert_called_once_with(select_directory=True)
+
 
 class TestSettingsScreen:
     """Test SettingsScreen."""

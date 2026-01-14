@@ -3,10 +3,12 @@
 from pathlib import Path
 from typing import List, Optional
 
+from textual import work
 from textual.app import ComposeResult
-from textual.containers import Container, Vertical
+from textual.containers import Container, Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Input, Label, Static
+from textual.worker import Worker
 
 from medical_bill_analyzer.cli.utils import (
     get_credential_repository,
@@ -80,6 +82,15 @@ class AddWizardScreen(Screen):
     .hidden {
         display: none;
     }
+
+    #browse-buttons {
+        height: auto;
+        padding: 0 0 1 0;
+    }
+
+    #browse-buttons Button {
+        margin: 0 1 0 0;
+    }
     """
 
     def __init__(self):
@@ -99,6 +110,11 @@ class AddWizardScreen(Screen):
                 Input(
                     placeholder="/path/to/bill.pdf or /path/to/bills/",
                     id="file-input",
+                ),
+                Horizontal(
+                    Button("Browse File", id="browse-file-btn", variant="default"),
+                    Button("Browse Folder", id="browse-folder-btn", variant="default"),
+                    id="browse-buttons",
                 ),
                 id="step-content",
             ),
@@ -123,12 +139,80 @@ class AddWizardScreen(Screen):
             self.app.pop_screen()
         elif event.button.id == "delete-btn":
             self._delete_added_bills()
+        elif event.button.id == "browse-file-btn":
+            self._open_file_dialog(select_directory=False)
+        elif event.button.id == "browse-folder-btn":
+            self._open_file_dialog(select_directory=True)
         elif event.button.id == "next-btn":
             if self.current_step == 1:
                 self._validate_and_process_files()
             elif self.current_step == 2:
                 # After viewing results, go back to dashboard
                 self.app.pop_screen()
+
+    @work(thread=True)
+    def _open_file_dialog(self, select_directory: bool = False) -> str | None:
+        """Open native file picker in a separate thread.
+
+        Uses tkinter.filedialog which works cross-platform (macOS, Windows, Linux).
+        Runs in a worker thread to avoid blocking the Textual event loop.
+
+        Args:
+            select_directory: If True, opens folder picker. If False, opens file picker.
+
+        Returns:
+            Selected path as string, or None if cancelled.
+        """
+        try:
+            # Lazy import to avoid import errors when tkinter is not available
+            import tkinter as tk
+            from tkinter import filedialog
+
+            root = tk.Tk()
+            root.withdraw()  # Hide the root window
+            root.attributes("-topmost", True)  # Bring dialog to front
+            root.focus_force()  # Force focus on macOS
+
+            if select_directory:
+                path = filedialog.askdirectory(
+                    title="Select folder containing PDF bills",
+                    parent=root,
+                )
+            else:
+                path = filedialog.askopenfilename(
+                    title="Select PDF bill",
+                    filetypes=[("PDF files", "*.pdf"), ("All files", "*.*")],
+                    parent=root,
+                )
+
+            root.destroy()
+            return path if path else None
+        except ImportError:
+            # tkinter not available
+            self.app.call_from_thread(
+                self.app.notify,
+                "File picker not available (tkinter not installed)",
+                severity="error",
+            )
+            return None
+        except Exception as e:
+            # Handle cases where tkinter/display is not available
+            self.app.call_from_thread(
+                self.app.notify,
+                f"Could not open file picker: {e}",
+                severity="error",
+            )
+            return None
+
+    def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
+        """Handle file dialog worker completion."""
+        if event.worker.name == "_open_file_dialog" and event.worker.is_finished:
+            result = event.worker.result
+            if result:
+                # Update the input field with the selected path
+                file_input = self.query_one("#file-input", Input)
+                file_input.value = result
+                file_input.focus()
 
     def _validate_and_process_files(self) -> None:
         """Validate file input and start processing."""
