@@ -14,11 +14,21 @@ Output:
 
 import sys
 from pathlib import Path
+from PyInstaller.utils.hooks import collect_submodules, collect_data_files
 
 # Get the project root directory
 spec_dir = Path(SPECPATH)
 project_root = spec_dir.parent
 src_dir = project_root / "src"
+
+# Collect all submodules for packages that use lazy loading or dynamic imports
+textual_imports = collect_submodules('textual')
+rich_imports = collect_submodules('rich')
+pydantic_imports = collect_submodules('pydantic')
+pydantic_core_imports = collect_submodules('pydantic_core')
+
+# Collect data files (CSS, etc.) for textual
+textual_datas = collect_data_files('textual')
 
 # Analysis - collect all imports and data files
 a = Analysis(
@@ -31,7 +41,7 @@ a = Analysis(
             str(src_dir / "medical_bill_analyzer" / "database" / "migrations" / "*.sql"),
             "medical_bill_analyzer/database/migrations"
         ),
-    ],
+    ] + textual_datas,
     hiddenimports=[
         # LLM Providers
         "anthropic",
@@ -41,7 +51,12 @@ a = Analysis(
         "httpcore",
         "h11",
         "anyio",
+        "anyio._backends",
+        "anyio._backends._asyncio",
         "sniffio",
+        "certifi",
+        "distro",
+        "jiter",
         # PDF Processing
         "pdfplumber",
         "pdfminer",
@@ -53,25 +68,6 @@ a = Analysis(
         "pdfminer.layout",
         "PIL",
         "PIL._imaging",
-        # TUI (Textual)
-        "textual",
-        "textual.app",
-        "textual.widgets",
-        "textual.screen",
-        "textual.containers",
-        "textual.css",
-        "textual.css.query",
-        "textual.driver",
-        "textual.drivers",
-        "textual.drivers.linux_driver",
-        "textual.drivers.windows_driver",
-        "rich",
-        "rich.console",
-        "rich.table",
-        "rich.progress",
-        "rich.panel",
-        "rich.markup",
-        "rich.syntax",
         # CLI
         "typer",
         "typer.main",
@@ -133,7 +129,7 @@ a = Analysis(
         "medical_bill_analyzer.analytics",
         "medical_bill_analyzer.analytics.engine",
         "medical_bill_analyzer.utils",
-    ],
+    ] + textual_imports + rich_imports + pydantic_imports + pydantic_core_imports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
