@@ -165,7 +165,7 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 **🎉 Phase 4b Packaging is complete - standalone executable ready!**
 
 ### Testing Status
-- **Total**: ✅ 492 tests, 59% coverage
+- **Total**: ✅ 495 tests, 59% coverage
 - **Phase 1 (Complete)**: ✅ 407 tests, 59% coverage (CLI code not fully tested)
 - **Phase 2 (Complete)**: ✅ 55 tests total, 98-100% coverage
   - Unit tests: 41 tests (models, engine), 100% coverage
@@ -229,6 +229,22 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 ---
 
 ## Recent Updates
+
+### 2026-01-14 - Native File Picker & uv Migration ✅
+- **Migrated from Poetry to uv** for package management
+  - Converted pyproject.toml to PEP 621 format
+  - Updated all build scripts and GitHub Actions workflow
+  - Removed poetry.lock, added uv.lock
+- **Added native file picker to TUI Add Wizard**
+  - "Browse File" and "Browse Folder" buttons for easy file selection
+  - Uses osascript (AppleScript) on macOS for native Finder dialog
+  - Uses tkinter on Windows/Linux
+  - Runs in worker thread to avoid blocking TUI
+- **Fixed TUI launch issues in bundled executable**
+  - Fixed isatty() check that prevented TUI from launching
+  - Added comprehensive Textual hidden imports using collect_submodules()
+  - Improved error messages when TUI fails to launch
+- **Test Results**: 495 passed, 59% coverage
 
 ### 2026-01-07 - GitHub Actions CI/CD Added ✅
 - **Phase 4b now fully complete (8/8 tasks) - Cross-platform builds automated!**
@@ -588,4 +604,4 @@ This file tracks the overall implementation progress. Each phase has a detailed 
 
 ---
 
-Last Updated: 2026-01-07
+Last Updated: 2026-01-14

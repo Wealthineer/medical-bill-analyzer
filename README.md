@@ -21,6 +21,7 @@ A desktop application for German private health insurance (PKV) customers to ana
 - ✅ Interactive dashboard with spending overview (current year)
 - ✅ Navigate between screens with keyboard shortcuts (q, d, s, b, a)
 - ✅ Add bills through wizard with detailed extraction preview
+- ✅ Native file picker (Browse File/Folder buttons) for easy file selection
 - ✅ Delete bills (X key in Bills screen, or after adding)
 - ✅ View statistics with year navigation (practitioner breakdown)
 - ✅ Smart path handling for drag-and-drop PDFs
@@ -68,6 +69,13 @@ chmod +x medical-bill-analyzer-linux-amd64
 2. Double-click `medical-bill-analyzer-windows-amd64.exe`
 
 **First Run:** The application will automatically open the Settings screen to configure your LLM provider (Anthropic, OpenAI, LM Studio, or Ollama).
+
+**macOS Security Note:** When first opening the app, macOS may block it. To allow it:
+```bash
+# Remove quarantine attribute
+xattr -cr ./medical-bill-analyzer-macos-amd64
+```
+Or: Right-click → Open → Click "Open" in the dialog.
 
 ### Option 2: From Source (For Developers)
 
@@ -228,6 +236,44 @@ medical-bill-analyzer stats --by month --year 2024
 medical-bill-analyzer stats --by practitioner --type Zahnarzt
 ```
 
+## LLM Provider Setup
+
+The app requires an LLM (Large Language Model) to extract information from your medical bills. You have several options:
+
+### Cloud Providers (Recommended for Best Accuracy)
+
+**Anthropic Claude** (Recommended):
+1. Sign up at [console.anthropic.com](https://console.anthropic.com/)
+2. Go to API Keys → Create Key
+3. Copy the API key (starts with `sk-ant-`)
+4. Paste it in the app's Settings screen
+
+**OpenAI GPT**:
+1. Sign up at [platform.openai.com](https://platform.openai.com/)
+2. Go to API Keys → Create new secret key
+3. Copy the API key (starts with `sk-`)
+4. Paste it in the app's Settings screen
+
+**Cost**: Both providers charge per API call. Processing a typical medical bill costs approximately $0.01-0.05 USD.
+
+### Local Models (Free, Private)
+
+For completely local processing with no data sent to external services:
+
+**LM Studio** (Easiest):
+1. Download from [lmstudio.ai](https://lmstudio.ai/)
+2. Download a model (e.g., Llama 3.1 8B or Mistral 7B)
+3. Start the local server (shows URL like `http://127.0.0.1:1234`)
+4. In the app Settings, select "LM Studio" and paste the URL
+
+**Ollama**:
+1. Install from [ollama.com](https://ollama.com/)
+2. Pull a model: `ollama pull llama3.1:8b`
+3. Ollama runs automatically on `http://localhost:11434`
+4. In the app Settings, select "Ollama"
+
+**Note**: Local models may be less accurate than Claude or GPT for extracting German medical bill details.
+
 ## Configuration
 
 The application stores all configuration in the SQLite database at `~/.medical-bill-analyzer/data/medical_bills.db`.
@@ -339,7 +385,7 @@ git push origin v1.1.0
 ```
 
 **What happens automatically:**
-1. GitHub Actions runs the full test suite (492 tests)
+1. GitHub Actions runs the full test suite (495 tests)
 2. If tests pass, builds executables for Linux, macOS, and Windows in parallel
 3. Creates a GitHub Release with:
    - `medical-bill-analyzer-linux-amd64.tar.gz`
@@ -386,7 +432,7 @@ uv run pytest tests/integration/
 
 ### Test Coverage
 
-**Current Status**: 492 tests, 59% overall coverage
+**Current Status**: 495 tests, 59% overall coverage
 
 | Module | Tests | Coverage | Type |
 |--------|-------|----------|------|
